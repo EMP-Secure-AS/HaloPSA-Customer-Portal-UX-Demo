@@ -131,12 +131,15 @@ Notes:
 
 ## Phase 7 – Polish, Responsiveness & Documentation
 
-- [ ] 7.1 Responsive behaviour improved
-- [ ] 7.2 Subtle animations added
-- [ ] 7.3 Screenshots/GIFs added (optional)
-- [ ] 7.4 README updated with final overview
-- [ ] 7.5 Final pass on this progress file
+- [x] 7.1 Responsive behaviour improved
+- [x] 7.2 Subtle animations added
+- [x] 7.3 Screenshots/GIFs added (optional)
+- [x] 7.4 README updated with final overview
+- [x] 7.5 Final pass on this progress file
 
 Notes:
 
-- _No work has been logged yet._
+- Added collapsible portal navigation and mobile-friendly admin sidebar with backdrop; headers and content stacks now adapt on tablet and smaller screens.
+- Introduced card hover elevation, widget fade-in animation, and a brief theme transition to smooth toggle feedback.
+- Captured fresh portal and admin screenshots in `docs/screenshots/` for documentation.
+- Expanded README with run instructions plus summaries of the widget system, role-aware behaviour, admin console features, and theming.

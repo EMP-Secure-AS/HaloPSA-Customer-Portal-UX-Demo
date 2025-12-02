@@ -16,6 +16,7 @@
 
   function setTheme(theme, opts) {
     var root = document.documentElement;
+    root.classList.add("theme-transition");
     root.setAttribute("data-theme", theme);
     if (!opts || !opts.skipSave) {
       try {
@@ -25,6 +26,9 @@
       }
     }
     updateToggleLabels(theme);
+    setTimeout(function () {
+      root.classList.remove("theme-transition");
+    }, 260);
   }
 
   function applyStoredTheme() {
@@ -120,6 +124,62 @@
     btn.addEventListener("click", toggleTheme);
   }
 
+  function wirePortalNavToggle() {
+    var toggle = document.getElementById("portal-menu-toggle");
+    var nav = document.getElementById("portal-nav");
+    if (!toggle || !nav) return;
+
+    var updateState = function (isOpen) {
+      document.body.classList.toggle("portal-nav-open", isOpen);
+      toggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
+    };
+
+    toggle.addEventListener("click", function () {
+      var next = !document.body.classList.contains("portal-nav-open");
+      updateState(next);
+    });
+
+    nav.addEventListener("click", function (event) {
+      if (event.target.tagName === "A" && document.body.classList.contains("portal-nav-open")) {
+        updateState(false);
+      }
+    });
+  }
+
+  function wireAdminSidebar() {
+    var toggle = document.getElementById("sidebar-toggle");
+    var sidebar = document.getElementById("admin-sidebar");
+    var backdrop = document.getElementById("admin-backdrop");
+    if (!toggle || !sidebar) return;
+
+    var mq = window.matchMedia ? window.matchMedia("(min-width: 1081px)") : null;
+
+    var setOpen = function (isOpen) {
+      sidebar.classList.toggle("is-open", isOpen);
+      document.body.classList.toggle("admin-sidebar-open", isOpen);
+      toggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
+    };
+
+    toggle.addEventListener("click", function () {
+      setOpen(!sidebar.classList.contains("is-open"));
+    });
+
+    if (backdrop) {
+      backdrop.addEventListener("click", function () {
+        setOpen(false);
+      });
+    }
+
+    if (mq && mq.addEventListener) {
+      mq.addEventListener("change", function (event) {
+        setOpen(event.matches);
+      });
+      setOpen(mq.matches);
+    } else {
+      setOpen(true);
+    }
+  }
+
   function wireAdminNavigation() {
     var buttons = document.querySelectorAll(".admin-nav-item");
     var sections = document.querySelectorAll(".admin-section");
@@ -156,7 +216,14 @@
 
   function createWidgetContainer(widget) {
     var wrapper = document.createElement("article");
-    wrapper.className = widget.id === "hero-search" ? "" : "card";
+    var classes = ["widget"];
+    var isHero = widget.id === "hero-search";
+    if (isHero) {
+      classes.push("hero");
+    } else {
+      classes.push("card");
+    }
+    wrapper.className = classes.join(" ");
     wrapper.setAttribute("data-widget-id", widget.id);
     wrapper.setAttribute("data-widget-variant", widget.variant || "");
     return wrapper;
@@ -228,6 +295,7 @@
     wireThemeButton("theme-toggle");
     applyStoredRole();
     wireRolePicker("role-select");
+    wirePortalNavToggle();
     renderPortal(currentRole);
   }
 
@@ -236,6 +304,7 @@
     wireThemeButton("admin-theme-toggle");
     applyStoredRole();
     wireRolePicker("admin-role-select");
+    wireAdminSidebar();
     wireAdminNavigation();
     if (window.AdminConsole && window.AdminConsole.init) {
       window.AdminConsole.init();
