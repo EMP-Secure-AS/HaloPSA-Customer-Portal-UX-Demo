@@ -166,7 +166,6 @@
     var content = document.getElementById("portal-content");
     if (!content || !window.LayoutLibrary || !window.WidgetSystem) return;
 
-    window.WidgetSystem.registerCoreWidgets();
     var renderWidgets = function () {
       var layout = window.LayoutLibrary.getLayoutForRole("home", role);
       content.innerHTML = "";
@@ -190,7 +189,8 @@
             var options = {
               role: role,
               variant: widget.variant,
-              ticketView: window.LayoutLibrary.getTicketViewForRole(role)
+              ticketView: window.LayoutLibrary.getTicketViewForRole(role),
+              config: window.LayoutLibrary.getWidgetConfig(widget.id)
             };
             window.WidgetSystem.renderWidget(widget.id, widgetContainer, options);
           });
@@ -207,7 +207,15 @@
       });
     };
 
-    window.WidgetSystem.loadWidgetRegistry().then(renderWidgets).catch(renderWidgets);
+    window.WidgetSystem
+      .loadWidgetRegistry()
+      .then(function (registryData) {
+        if (registryData && registryData.customManifests && window.LayoutLibrary.registerCustomWidgets) {
+          window.LayoutLibrary.registerCustomWidgets(registryData.customManifests);
+        }
+        renderWidgets();
+      })
+      .catch(renderWidgets);
   }
 
   function renderPortal(role) {

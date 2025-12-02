@@ -7,5 +7,7 @@
     { "id": "service-status", "name": "Service Status", "description": "Current health of key services." },
     { "id": "top-articles", "name": "Top Articles", "description": "Frequently used knowledge base content." }
   ],
-  "custom": []
+  "custom": [
+    { "id": "dns-manager", "path": "custom/dns-manager/manifest.json" }
+  ]
 }

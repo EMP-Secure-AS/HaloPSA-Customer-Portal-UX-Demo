@@ -2,6 +2,10 @@
 (function () {
   var registry = {};
   var registryUrl = "../widgets/registry.json";
+  var widgetBasePath = registryUrl.replace("registry.json", "");
+  var registryPromise = null;
+  var customManifests = [];
+  var coreRegistered = false;
 
   function renderStatusPill(label, tone) {
     var pill = document.createElement("span");
@@ -41,6 +45,7 @@
   }
 
   function registerCoreWidgets() {
+    coreRegistered = true;
     registry["hero-search"] = function (container) {
       container.classList.add("hero", "stack");
       container.innerHTML =
@@ -264,6 +269,7 @@
   }
 
   function renderWidget(widgetId, container, options) {
+    ensureCore();
     var renderer = registry[widgetId];
     if (!renderer) {
       container.innerHTML =
@@ -273,20 +279,96 @@
     renderer(container, options || {});
   }
 
+  function ensureCore() {
+    if (!coreRegistered) {
+      registerCoreWidgets();
+    }
+  }
+
+  function loadManifest(manifestRef) {
+    var path = typeof manifestRef === "string" ? manifestRef : manifestRef.path;
+    if (!path) return Promise.resolve(null);
+    var fullPath = widgetBasePath + path;
+    var basePath = fullPath.substring(0, fullPath.lastIndexOf("/") + 1);
+    return fetch(fullPath)
+      .then(function (resp) {
+        if (!resp.ok) throw new Error("Failed to load manifest");
+        return resp.json();
+      })
+      .then(function (manifest) {
+        manifest.__basePath = basePath;
+        return manifest;
+      })
+      .catch(function () {
+        return null;
+      });
+  }
+
+  function loadCustomManifests(customRefs) {
+    return Promise.all((customRefs || []).map(loadManifest)).then(function (loaded) {
+      return loaded.filter(Boolean);
+    });
+  }
+
+  function loadCustomComponent(manifest) {
+    if (!manifest || !manifest.entry) return Promise.resolve(null);
+    return new Promise(function (resolve) {
+      var script = document.createElement("script");
+      script.src = manifest.__basePath + manifest.entry;
+      script.onload = function () {
+        var renderer =
+          (window.CustomWidgetComponents && window.CustomWidgetComponents[manifest.id]) || null;
+        if (renderer) {
+          registry[manifest.id] = renderer;
+        }
+        resolve(renderer);
+      };
+      script.onerror = function () {
+        resolve(null);
+      };
+      document.head.appendChild(script);
+    });
+  }
+
+  function loadCustomComponents(manifests) {
+    return Promise.all(manifests.map(loadCustomComponent));
+  }
+
   function loadWidgetRegistry() {
-    return fetch(registryUrl)
+    if (registryPromise) return registryPromise;
+
+    registryPromise = fetch(registryUrl)
       .then(function (resp) {
         if (!resp.ok) throw new Error("Failed to load widget registry");
         return resp.json();
       })
+      .then(function (data) {
+        ensureCore();
+        return loadCustomManifests(data.custom || []).then(function (manifests) {
+          customManifests = manifests;
+          return loadCustomComponents(manifests).then(function () {
+            return {
+              core: data.core || [],
+              custom: data.custom || [],
+              customManifests: manifests,
+            };
+          });
+        });
+      })
       .catch(function () {
-        return { core: [], custom: [] };
+        ensureCore();
+        return { core: [], custom: [], customManifests: [] };
       });
+
+    return registryPromise;
   }
 
   window.WidgetSystem = {
     registerCoreWidgets: registerCoreWidgets,
     renderWidget: renderWidget,
     loadWidgetRegistry: loadWidgetRegistry,
+    getCustomManifests: function () {
+      return customManifests.slice();
+    },
   };
 })();
