@@ -12,6 +12,13 @@
     { id: "hero-search", name: "Hero Search", description: "Search-focused hero with prompts" },
     { id: "quick-actions", name: "Quick Actions", description: "Common IT shortcuts" },
     { id: "recent-tickets", name: "My Tickets", description: "Latest support requests" },
+    { id: "ticket-details", name: "Ticket Details", description: "Drill into an individual ticket" },
+    { id: "issue-form", name: "Report Issue", description: "Raise an incident" },
+    { id: "service-catalog", name: "Service Catalog", description: "Browse and request services" },
+    { id: "kb-categories", name: "Knowledge Categories", description: "Browse knowledge base areas" },
+    { id: "kb-article", name: "Knowledge Article", description: "Read a selected article" },
+    { id: "insights-dashboard", name: "Dashboards", description: "Interactive analytics" },
+    { id: "legacy-feedback", name: "Legacy & Feedback", description: "Old tickets and feedback" },
     { id: "news", name: "News", description: "IT or company news feed" },
     { id: "service-status", name: "Service Status", description: "Health of core services" },
     { id: "top-articles", name: "Top Articles", description: "Frequently used KB content" },
@@ -22,6 +29,13 @@
     "hero-search": roles.map(function (r) { return r.id; }),
     "quick-actions": roles.map(function (r) { return r.id; }),
     "recent-tickets": roles.map(function (r) { return r.id; }),
+    "ticket-details": roles.map(function (r) { return r.id; }),
+    "issue-form": roles.map(function (r) { return r.id; }),
+    "service-catalog": roles.map(function (r) { return r.id; }),
+    "kb-categories": roles.map(function (r) { return r.id; }),
+    "kb-article": roles.map(function (r) { return r.id; }),
+    "insights-dashboard": ["manager", "local_it", "company_it", "group_it"],
+    "legacy-feedback": roles.map(function (r) { return r.id; }),
     news: roles.map(function (r) { return r.id; }),
     "service-status": ["end_user", "manager", "local_it", "company_it", "group_it"],
     "top-articles": roles.map(function (r) { return r.id; }),
@@ -62,19 +76,27 @@
   };
 
   var navItems = [
-    { id: "nav-home", label: "Home", route: "/portal", icon: "home", visibleForRoles: roles.map(function (r) { return r.id; }) },
-    { id: "nav-tickets", label: "My Tickets", route: "/portal/tickets", icon: "ticket", visibleForRoles: roles.map(function (r) { return r.id; }) },
-    { id: "nav-kb", label: "Knowledge Base", route: "/portal/kb", icon: "book", visibleForRoles: roles.map(function (r) { return r.id; }) },
-    { id: "nav-dash", label: "Dashboards", route: "/portal/dashboards", icon: "chart", visibleForRoles: ["manager", "local_it", "company_it", "group_it"] },
-    { id: "nav-onboarding", label: "Onboarding Hub", route: "/portal/onboarding", icon: "sparkles", visibleForRoles: ["end_user", "manager"] },
-    { id: "nav-dns", label: "DNS Manager", route: "/portal/dns", icon: "globe", visibleForRoles: ["local_it", "company_it", "group_it"] }
+    { id: "nav-home", label: "Home", route: "/portal", pageId: "home", icon: "home", visibleForRoles: roles.map(function (r) { return r.id; }) },
+    { id: "nav-tickets", label: "My Tickets", route: "/portal/tickets", pageId: "tickets", icon: "ticket", visibleForRoles: roles.map(function (r) { return r.id; }) },
+    { id: "nav-ticket-details", label: "Ticket details", route: "/portal/tickets/view", pageId: "ticket-details", icon: "open_in_new", visibleForRoles: roles.map(function (r) { return r.id; }) },
+    { id: "nav-report", label: "Report issue", route: "/portal/report", pageId: "report-issue", icon: "alert", visibleForRoles: roles.map(function (r) { return r.id; }) },
+    { id: "nav-request", label: "Send request", route: "/portal/request", pageId: "service-catalog", icon: "plus", visibleForRoles: roles.map(function (r) { return r.id; }) },
+    { id: "nav-kb", label: "Knowledge Base", route: "/portal/kb", pageId: "knowledge", icon: "book", visibleForRoles: roles.map(function (r) { return r.id; }) },
+    { id: "nav-dash", label: "Dashboards", route: "/portal/dashboards", pageId: "dashboards", icon: "chart", visibleForRoles: ["manager", "local_it", "company_it", "group_it"] },
+    { id: "nav-legacy", label: "Old tickets & feedback", route: "/portal/legacy", pageId: "legacy", icon: "archive", visibleForRoles: roles.map(function (r) { return r.id; }) },
+    { id: "nav-onboarding", label: "Onboarding Hub", route: "/portal/onboarding", pageId: "onboarding", icon: "sparkles", visibleForRoles: ["end_user", "manager"] },
+    { id: "nav-dns", label: "DNS Manager", route: "/portal/dns", pageId: "dns", icon: "globe", visibleForRoles: ["local_it", "company_it", "group_it"] }
   ];
 
   var pages = [
     { id: "home", name: "Home", route: "/portal", type: "core", status: "Published", visibleForRoles: roles.map(function (r) { return r.id; }) },
     { id: "tickets", name: "My Tickets", route: "/portal/tickets", type: "core", status: "Published", visibleForRoles: roles.map(function (r) { return r.id; }) },
+    { id: "ticket-details", name: "Ticket details", route: "/portal/tickets/view", type: "core", status: "Published", visibleForRoles: roles.map(function (r) { return r.id; }) },
+    { id: "report-issue", name: "Report an issue", route: "/portal/report", type: "core", status: "Published", visibleForRoles: roles.map(function (r) { return r.id; }) },
+    { id: "service-catalog", name: "Send a request", route: "/portal/request", type: "core", status: "Published", visibleForRoles: roles.map(function (r) { return r.id; }) },
     { id: "knowledge", name: "Knowledge Base", route: "/portal/kb", type: "core", status: "Published", visibleForRoles: roles.map(function (r) { return r.id; }) },
-    { id: "dashboards", name: "Dashboards", route: "/portal/dashboards", type: "core", status: "Draft", visibleForRoles: ["manager", "local_it", "company_it", "group_it"] },
+    { id: "dashboards", name: "Dashboards", route: "/portal/dashboards", type: "core", status: "Published", visibleForRoles: ["manager", "local_it", "company_it", "group_it"] },
+    { id: "legacy", name: "Old tickets & feedback", route: "/portal/legacy", type: "core", status: "Published", visibleForRoles: roles.map(function (r) { return r.id; }) },
     { id: "onboarding", name: "Onboarding Hub", route: "/portal/onboarding", type: "custom", status: "Published", visibleForRoles: ["end_user", "manager"] },
     { id: "dns", name: "DNS Manager", route: "/portal/dns", type: "custom", status: "Published", visibleForRoles: ["local_it", "company_it", "group_it"] }
   ];
@@ -83,6 +105,7 @@
     home: {
       id: "home",
       title: "Home",
+      description: "Landing space with quick access, tickets, and service health.",
       rows: [
         {
           id: "row-hero",
@@ -150,6 +173,7 @@
     tickets: {
       id: "tickets",
       title: "My Tickets",
+      description: "Work your queue with filters and a condensed list view.",
       rows: [
         {
           id: "row-ticket-summary",
@@ -166,15 +190,82 @@
         }
       ]
     },
+    "ticket-details": {
+      id: "ticket-details",
+      title: "Ticket details",
+      description: "Full view of a ticket with timeline and related knowledge.",
+      rows: [
+        {
+          id: "row-ticket-body",
+          label: "Ticket overview",
+          columns: [
+            { width: 8, widgets: [{ id: "ticket-details", visibleForRoles: widgetVisibility["ticket-details"] }] },
+            {
+              width: 4,
+              widgets: [
+                { id: "kb-article", visibleForRoles: widgetVisibility["kb-article"] },
+                { id: "top-articles", visibleForRoles: widgetVisibility["top-articles"] }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "report-issue": {
+      id: "report-issue",
+      title: "Report an issue",
+      description: "Log a new incident with a short, guided form.",
+      rows: [
+        {
+          id: "row-issue",
+          label: "Issue form",
+          columns: [
+            {
+              width: 8,
+              widgets: [{ id: "issue-form", visibleForRoles: widgetVisibility["issue-form"] }]
+            },
+            {
+              width: 4,
+              widgets: [
+                { id: "kb-categories", visibleForRoles: widgetVisibility["kb-categories"] },
+                { id: "service-status", visibleForRoles: widgetVisibility["service-status"] }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "service-catalog": {
+      id: "service-catalog",
+      title: "Send a request",
+      description: "Browse services, approvals, and fulfilment SLAs.",
+      rows: [
+        {
+          id: "row-catalog",
+          label: "Service catalog",
+          columns: [
+            { width: 8, widgets: [{ id: "service-catalog", visibleForRoles: widgetVisibility["service-catalog"] }] },
+            { width: 4, widgets: [{ id: "quick-actions", visibleForRoles: widgetVisibility["quick-actions"] }] }
+          ]
+        }
+      ]
+    },
     knowledge: {
       id: "knowledge",
       title: "Knowledge Base",
+      description: "Browse categories and read articles without leaving the portal.",
       rows: [
         {
           id: "row-top-articles",
           label: "Articles",
           columns: [
-            { width: 8, widgets: [{ id: "top-articles", visibleForRoles: widgetVisibility["top-articles"] }] },
+            {
+              width: 8,
+              widgets: [
+                { id: "kb-categories", visibleForRoles: widgetVisibility["kb-categories"] },
+                { id: "kb-article", visibleForRoles: widgetVisibility["kb-article"] }
+              ]
+            },
             { width: 4, widgets: [{ id: "news", visibleForRoles: widgetVisibility.news }] }
           ]
         }
@@ -183,6 +274,7 @@
     dashboards: {
       id: "dashboards",
       title: "Dashboards",
+      description: "Lightweight interactive dashboard mock for IT leaders.",
       rows: [
         {
           id: "row-status",
@@ -196,7 +288,27 @@
           id: "row-reports",
           label: "Reports",
           columns: [
-            { width: 12, widgets: [{ id: "news", visibleForRoles: widgetVisibility.news }] }
+            { width: 12, widgets: [{ id: "insights-dashboard", visibleForRoles: widgetVisibility["insights-dashboard"] }] }
+          ]
+        }
+      ]
+    },
+    legacy: {
+      id: "legacy",
+      title: "Old tickets & feedback",
+      description: "Review closed work and share a quick satisfaction score.",
+      rows: [
+        {
+          id: "row-legacy",
+          label: "Closed tickets",
+          columns: [
+            {
+              width: 12,
+              widgets: [
+                { id: "legacy-feedback", visibleForRoles: widgetVisibility["legacy-feedback"] },
+                { id: "recent-tickets", variant: "summary", visibleForRoles: widgetVisibility["recent-tickets"] }
+              ]
+            }
           ]
         }
       ]
@@ -301,10 +413,18 @@
     return filterByRole(getPages(), role);
   }
 
+  function getPageById(id) {
+    var page = pages.find(function (p) {
+      return p.id === id;
+    });
+    return page ? clone(page) : null;
+  }
+
   function defaultLayout(pageId) {
     return {
       id: pageId,
       title: "Custom page",
+      description: "Autogenerated layout",
       rows: [
         {
           id: "row-" + pageId + "-1",
@@ -487,6 +607,7 @@
     moveNavItem: moveNavItem,
     getPages: getPages,
     getPagesForRole: getPagesForRole,
+    getPageById: getPageById,
     addPage: addPage,
     getPageLayout: getPageLayout,
     getLayoutForRole: getLayoutForRole,

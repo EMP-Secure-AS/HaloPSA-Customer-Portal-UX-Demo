@@ -358,3 +358,86 @@ If Codex (or a human) discovers new features to add:
 - Reference those tasks in `docs/codex-progress.md`.
 
 Always keep the plan & progress in sync so future sessions can continue smoothly.
+
+---
+
+## Phase 8 – Portal Page Coverage & Navigation
+
+**Goals:**
+
+- Deliver standalone portal experiences for every core end-user page.
+- Ensure the navigation model controls which widgets and layouts appear per page and per role.
+- Keep the role-based visibility already in place.
+
+**Tasks:**
+
+8.1 Add routes/views for all key portal pages:
+   - Home
+   - My Tickets (list + filters via the My Tickets widget)
+   - Ticket details (mocked record view)
+   - Report an Issue
+   - Send a Request (service catalog mock)
+   - Knowledge Base (category list + article view)
+   - Dashboards (interactive mock, not just a static embed)
+   - Old tickets / Feedback (if relevant)
+
+8.2 Extend the navigation model so each route maps to a page layout and honours visibility by role.
+
+8.3 Reuse the shared layout model so each page pulls the correct widgets for the active role.
+
+8.4 Keep using mock data where backend calls would normally be needed.
+
+8.5 Update docs and progress to reflect the new page coverage.
+
+---
+
+## Phase 9 – Halo Settings Mapping & Config UI
+
+**Goals:**
+
+- Map every Halo Self Service Portal setting into the demo with clear coverage status.
+- Extend the admin console with fields/toggles that correspond to the official settings guide.
+- Wire up settings that can influence the mock experience (titles, colors, nav visibility, behaviour flags).
+
+**Tasks:**
+
+9.1 Read the official Halo Self Service Portal settings guide and enumerate all settings.
+
+9.2 Create `docs/halo-settings-map.md` that:
+   - Groups settings into logical categories (Branding, Authentication, Anonymous users, Menu buttons, Approvals, etc.).
+   - Maps each setting to a location in the admin console and control type.
+   - Marks each setting as "Fully implemented in the demo", "Partially represented (visual only)", or "Documented only".
+
+9.3 Extend the admin console UI to include fields/toggles for all relevant settings from the guide.
+
+9.4 Wire up settings that can influence the demo experience:
+   - Portal title, welcome message, brand colors, logo.
+   - Menu buttons / navigation visibility.
+   - Behaviour flags that change what the user can see/do (even without a backend).
+
+9.5 Update docs and progress with coverage notes.
+
+---
+
+## Phase 10 – Advanced Page/Block Editor
+
+**Goals:**
+
+- Turn the layout editor into a more realistic block/page editor with rows, columns, and widget configuration.
+- Allow reordering, property editing, and optional persistence.
+
+**Tasks:**
+
+10.1 Add the ability to add/remove rows with selectable column layouts (1–4 columns).
+
+10.2 Support reordering rows and widgets (drag-and-drop or button-based reordering).
+
+10.3 Provide a widget property panel to edit configuration (title, data scope, role visibility, etc.).
+
+10.4 Ensure changes write back to the shared layout model used by the portal.
+
+10.5 Optionally persist layouts to localStorage so edits survive reloads in the demo.
+
+10.6 Improve editor visuals with clear borders, placeholders, and affordances to mimic a real builder.
+
+10.7 Update docs and progress for Phase 10 tasks.
