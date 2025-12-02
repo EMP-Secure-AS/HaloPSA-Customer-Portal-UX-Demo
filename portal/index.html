@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <title>Halo Portal UX Demo – Customer Portal</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml" />
   <link rel="stylesheet" href="../assets/css/base.css" />
 </head>
 <body>
@@ -27,11 +28,52 @@
   </header>
 
   <main class="app-main">
-    <h1>Customer Portal – UX Demo</h1>
-    <p>
-      This is a placeholder for the customer portal homepage.
-      Codex will gradually turn this into a fully widget‑based layout.
-    </p>
+    <div class="container stack">
+      <section class="hero">
+        <div class="stack">
+          <div class="inline">
+            <div class="badge">Portal Demo</div>
+            <span class="muted small-text">Static layout – Phase 1</span>
+          </div>
+          <h1>How can we help you today?</h1>
+          <p>
+            Quickly raise issues, request services, and find answers in our knowledge base.
+            This page will evolve into a widget-driven experience in later phases.
+          </p>
+          <div class="search-bar">
+            <input type="search" placeholder="Search for help, articles, or services" aria-label="Search" />
+            <button class="btn btn-primary">Search</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="page-section quick-actions">
+        <div class="inline" style="justify-content: space-between;">
+          <div>
+            <h2 style="margin: 0;">Get started</h2>
+            <p class="muted" style="margin: 0;">Common actions and shortcuts.</p>
+          </div>
+          <button class="btn btn-secondary">View all services</button>
+        </div>
+        <div class="card-grid">
+          <article class="card">
+            <div class="action-title">Report an issue</div>
+            <p class="muted">Log a new incident with IT support.</p>
+            <button class="btn btn-primary" style="align-self: flex-start;">Start ticket</button>
+          </article>
+          <article class="card">
+            <div class="action-title">Request a service</div>
+            <p class="muted">Browse available services and submit a request.</p>
+            <button class="btn btn-primary" style="align-self: flex-start;">Open catalog</button>
+          </article>
+          <article class="card">
+            <div class="action-title">My tickets</div>
+            <p class="muted">Check the status of your open requests.</p>
+            <button class="btn btn-primary" style="align-self: flex-start;">View tickets</button>
+          </article>
+        </div>
+      </section>
+    </div>
   </main>
 
   <script src="../assets/js/app.js"></script>

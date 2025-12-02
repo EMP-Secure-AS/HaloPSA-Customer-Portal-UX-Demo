@@ -1,9 +1,13 @@
-// Minimal JS glue. Later phases will expand significantly.
-
+// Core app wiring for portal + admin pages
 (function () {
   function applyStoredTheme() {
     var root = document.documentElement;
-    var stored = window.localStorage && window.localStorage.getItem("portal-theme");
+    var stored = null;
+    try {
+      stored = window.localStorage && window.localStorage.getItem("portal-theme");
+    } catch (e) {
+      stored = null;
+    }
     var theme = stored || "light";
     root.setAttribute("data-theme", theme);
     return theme;
@@ -17,7 +21,7 @@
     try {
       window.localStorage.setItem("portal-theme", next);
     } catch (e) {
-      // ignore
+      // ignore write errors
     }
   }
 
@@ -27,17 +31,7 @@
     btn.addEventListener("click", toggleTheme);
   }
 
-  window.initPortal = function () {
-    applyStoredTheme();
-    wireThemeButton("theme-toggle");
-    // Later phases will initialize widgets and layouts here.
-  };
-
-  window.initAdmin = function () {
-    applyStoredTheme();
-    wireThemeButton("admin-theme-toggle");
-
-    // Basic admin sidebar section switching
+  function wireAdminNavigation() {
     var buttons = document.querySelectorAll(".admin-nav-item");
     var sections = document.querySelectorAll(".admin-section");
 
@@ -55,5 +49,20 @@
         });
       });
     });
-  };
+  }
+
+  function initPortal() {
+    applyStoredTheme();
+    wireThemeButton("theme-toggle");
+    // Phase 1 keeps logic light; later phases will hydrate widgets/layouts here.
+  }
+
+  function initAdmin() {
+    applyStoredTheme();
+    wireThemeButton("admin-theme-toggle");
+    wireAdminNavigation();
+  }
+
+  window.initPortal = initPortal;
+  window.initAdmin = initAdmin;
 })();

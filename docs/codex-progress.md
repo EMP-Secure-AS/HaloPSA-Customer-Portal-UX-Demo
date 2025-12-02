@@ -30,16 +30,18 @@ Notes:
 
 ## Phase 1 – Basic Static Portal & Admin Skeleton
 
-- [ ] 1.1 `base.css` created with core styles
-- [ ] 1.2 `app.js` created with `initPortal()` and `initAdmin()`
-- [ ] 1.3 `portal/index.html` basic layout implemented
-- [ ] 1.4 `admin/index.html` basic layout implemented
-- [ ] 1.5 Optional favicon or placeholder added
-- [ ] 1.6 This progress file updated for Phase 1
+- [x] 1.1 `base.css` created with core styles
+- [x] 1.2 `app.js` created with `initPortal()` and `initAdmin()`
+- [x] 1.3 `portal/index.html` basic layout implemented
+- [x] 1.4 `admin/index.html` basic layout implemented
+- [x] 1.5 Optional favicon or placeholder added
+- [x] 1.6 This progress file updated for Phase 1
 
 Notes:
 
-- _No work has been logged yet._
+- Added foundational layout, spacing, and component styles for portal and admin shells along with shared tokens in `assets/css/base.css`.
+- Created modular `initPortal()` / `initAdmin()` wiring that preserves theme toggle and handles admin section switching.
+- Built static hero + quick action cards for portal and sidebar-driven admin skeleton; added small SVG favicon.
 
 ---
 
