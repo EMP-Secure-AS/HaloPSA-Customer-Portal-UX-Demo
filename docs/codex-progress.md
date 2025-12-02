@@ -79,16 +79,18 @@ Notes:
 
 ## Phase 4 – Admin Console: Navigation & Page Builder UI
 
-- [ ] 4.1 Admin sections wired to sidebar
-- [ ] 4.2 Navigation manager UI implemented
-- [ ] 4.3 Page list UI implemented
-- [ ] 4.4 Basic page layout editor implemented
-- [ ] 4.5 Layout model stored in JS/JSON
-- [ ] 4.6 Progress updated
+- [x] 4.1 Admin sections wired to sidebar
+- [x] 4.2 Navigation manager UI implemented
+- [x] 4.3 Page list UI implemented
+- [x] 4.4 Basic page layout editor implemented
+- [x] 4.5 Layout model stored in JS/JSON
+- [x] 4.6 Progress updated
 
 Notes:
 
-- _No work has been logged yet._
+- Added scoped admin views for Navigation and Pages, with sidebar-driven panel switching intact.
+- Created mock navigation model + reorder controls, page catalog with add button, and a layout editor that visualizes rows/columns and lets users add/remove widgets.
+- Stored navigation/page/layout data in `assets/js/layouts.js` for reuse in the console and future rendering work.
 
 ---
 

@@ -97,6 +97,9 @@
     applyStoredTheme();
     wireThemeButton("admin-theme-toggle");
     wireAdminNavigation();
+    if (window.AdminConsole && window.AdminConsole.init) {
+      window.AdminConsole.init();
+    }
   }
 
   window.initPortal = initPortal;

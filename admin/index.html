@@ -71,18 +71,51 @@
     </section>
 
     <section id="admin-section-navigation" class="admin-section stack">
-      <div class="card">
-        <h2 style="margin-top: 0;">Navigation</h2>
-        <p class="muted">Control portal menus, order, and role visibility.</p>
-        <p class="helper-text">Navigation manager will be built in Phase 4.</p>
+      <div class="card stack">
+        <div class="section-header">
+          <div class="stack" style="gap: 4px;">
+            <h2 style="margin: 0;">Navigation</h2>
+            <p class="muted" style="margin: 0;">Control portal menus, ordering, and visibility.</p>
+          </div>
+          <span class="pill">Phase 4 – navigation manager</span>
+        </div>
+        <div id="nav-manager-list" class="list-stack"></div>
+        <p class="helper-text">Use the arrows to reprioritize navigation without drag-and-drop.</p>
+      </div>
+      <div class="card stack">
+        <h3 style="margin: 0;">Visibility presets</h3>
+        <p class="muted" style="margin: 0;">Future phases will let you scope items by role or audience.</p>
+        <div class="inline" style="flex-wrap: wrap; gap: 0.5rem;">
+          <span class="pill">All roles</span>
+          <span class="pill">Signed-in</span>
+          <span class="pill">IT / Managers</span>
+          <span class="pill">Targeted hubs</span>
+        </div>
       </div>
     </section>
 
     <section id="admin-section-pages" class="admin-section stack">
-      <div class="card">
-        <h2 style="margin-top: 0;">Pages & Layouts</h2>
-        <p class="muted">A drag-and-drop page builder will live here.</p>
-        <p class="helper-text">Layouts will be editable in Phase 4.</p>
+      <div class="card stack">
+        <div class="section-header">
+          <div class="stack" style="gap: 4px;">
+            <h2 style="margin: 0;">Pages & Layouts</h2>
+            <p class="muted" style="margin: 0;">Browse portal pages, add new ones, and open their layouts.</p>
+          </div>
+          <button id="add-page-btn" class="btn btn-primary">Add custom page</button>
+        </div>
+        <div id="page-list" class="list-stack"></div>
+      </div>
+
+      <div class="card stack">
+        <div class="section-header">
+          <div class="stack" style="gap: 4px;">
+            <h3 style="margin: 0;">Page layout editor</h3>
+            <p class="muted" style="margin: 0;">Add or remove widgets inside rows and columns.</p>
+          </div>
+          <select id="layout-page-select" aria-label="Choose page to edit"></select>
+        </div>
+        <div id="layout-summary" class="stack" style="gap: 0.5rem;"></div>
+        <div id="layout-canvas" class="stack" style="gap: var(--space-8);"></div>
       </div>
     </section>
 
@@ -111,6 +144,8 @@
     </section>
   </div>
 
+  <script src="../assets/js/layouts.js"></script>
+  <script src="../assets/js/admin-console.js"></script>
   <script src="../assets/js/app.js"></script>
   <script>
     if (window.initAdmin) {
