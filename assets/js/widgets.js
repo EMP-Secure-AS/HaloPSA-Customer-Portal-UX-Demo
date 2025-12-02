@@ -90,58 +90,107 @@
         "</div>";
     };
 
-    registry["recent-tickets"] = function (container) {
+    registry["recent-tickets"] = function (container, options) {
+      var role = (options && options.role) || "end_user";
+      var ticketView = (options && options.ticketView) || { id: "summary", columns: [] };
+      var variant = options && options.variant ? options.variant : ticketView.id;
       var tickets = [
-        { id: "INC-1042", summary: "VPN disconnecting frequently", status: "Open", updated: "Just now" },
-        { id: "SR-2028", summary: "Request new headset", status: "In Progress", updated: "12m ago" },
-        { id: "INC-1037", summary: "Email sync delayed", status: "Awaiting User", updated: "1h ago" }
+        { id: "INC-1042", summary: "VPN disconnecting frequently", status: "Open", owner: "Service Desk", priority: "P2", age: "2h", updated: "Just now" },
+        { id: "SR-2028", summary: "Request new headset", status: "In Progress", owner: "Hardware", priority: "P4", age: "1d", updated: "12m ago" },
+        { id: "INC-1037", summary: "Email sync delayed", status: "Awaiting User", owner: "Messaging", priority: "P3", age: "5h", updated: "1h ago" }
       ];
 
       container.innerHTML = "";
       var header = document.createElement("div");
       header.className = "widget-header";
       var title = document.createElement("h3");
-      title.textContent = "Recent tickets";
+      title.textContent = variant === "operations" ? "Queue overview" : "Recent tickets";
       title.style.margin = "0";
       header.appendChild(title);
+      var badge = document.createElement("span");
+      badge.className = "pill";
+      badge.textContent = "Role: " + role.replace("_", " ");
+      header.appendChild(badge);
       var action = document.createElement("button");
       action.className = "btn btn-secondary";
       action.textContent = "View all";
       header.appendChild(action);
       container.appendChild(header);
 
-      var list = document.createElement("div");
-      list.className = "ticket-list";
-      tickets.forEach(function (ticket) {
-        var row = document.createElement("div");
-        row.className = "ticket-row";
+      if (variant === "operations") {
+        var table = document.createElement("div");
+        table.className = "ticket-table";
 
-        var main = document.createElement("div");
-        main.className = "ticket-row__main";
-        var id = document.createElement("div");
-        id.className = "pill";
-        id.textContent = ticket.id;
-        var summary = document.createElement("div");
-        summary.className = "ticket-row__summary";
-        summary.textContent = ticket.summary;
-        main.appendChild(id);
-        main.appendChild(summary);
-        row.appendChild(main);
+        var headerRow = document.createElement("div");
+        headerRow.className = "ticket-table__row ticket-table__row--head";
+        ticketView.columns.forEach(function (col) {
+          var cell = document.createElement("div");
+          cell.className = "ticket-table__cell";
+          cell.textContent = col;
+          headerRow.appendChild(cell);
+        });
+        table.appendChild(headerRow);
 
-        var meta = document.createElement("div");
-        meta.className = "ticket-row__meta";
-        var status = renderStatusPill(ticket.status, "info");
-        meta.appendChild(status);
-        var updated = document.createElement("span");
-        updated.className = "muted small-text";
-        updated.textContent = ticket.updated;
-        meta.appendChild(updated);
-        row.appendChild(meta);
+        tickets.forEach(function (ticket) {
+          var row = document.createElement("div");
+          row.className = "ticket-table__row";
+          ticketView.columns.forEach(function (col) {
+            var cell = document.createElement("div");
+            cell.className = "ticket-table__cell";
+            var value = ticket[col.toLowerCase()] || "—";
+            if (col === "Status") {
+              cell.appendChild(renderStatusPill(ticket.status, "info"));
+            } else {
+              cell.textContent = value;
+            }
+            row.appendChild(cell);
+          });
+          table.appendChild(row);
+        });
 
-        list.appendChild(row);
-      });
+        var filters = document.createElement("div");
+        filters.className = "helper-text";
+        filters.textContent = "Filters: " + (ticketView.filters || "All queues");
+        container.appendChild(filters);
+        container.appendChild(table);
+      } else {
+        var list = document.createElement("div");
+        list.className = "ticket-list";
+        tickets.forEach(function (ticket) {
+          var row = document.createElement("div");
+          row.className = "ticket-row";
 
-      container.appendChild(list);
+          var main = document.createElement("div");
+          main.className = "ticket-row__main";
+          var id = document.createElement("div");
+          id.className = "pill";
+          id.textContent = ticket.id;
+          var summary = document.createElement("div");
+          summary.className = "ticket-row__summary";
+          summary.textContent = ticket.summary;
+          main.appendChild(id);
+          main.appendChild(summary);
+          row.appendChild(main);
+
+          var meta = document.createElement("div");
+          meta.className = "ticket-row__meta";
+          var status = renderStatusPill(ticket.status, "info");
+          meta.appendChild(status);
+          var updated = document.createElement("span");
+          updated.className = "muted small-text";
+          updated.textContent = ticket.updated;
+          meta.appendChild(updated);
+          row.appendChild(meta);
+
+          list.appendChild(row);
+        });
+
+        var helper = document.createElement("div");
+        helper.className = "helper-text";
+        helper.textContent = "Showing simplified view for " + role.replace("_", " ");
+        container.appendChild(helper);
+        container.appendChild(list);
+      }
     };
 
     registry["news"] = function (container) {
