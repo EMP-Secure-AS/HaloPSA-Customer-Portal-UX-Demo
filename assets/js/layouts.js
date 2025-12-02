@@ -25,6 +25,41 @@
     { id: "dns-manager", name: "DNS Manager", description: "Manage DNS zones and records" }
   ];
 
+  var portalSettings = {
+    portalTitle: "Generic IT Support",
+    welcomeHeadline: "How can we help you today?",
+    welcomeMessage: "Quickly raise issues, request services, and find answers in our knowledge base.",
+    bannerText: "Portal Demo",
+    primaryColor: "#1363df",
+    accentColor: "#12c4ad",
+    headerColor: "#0b1f3b",
+    logoText: "G",
+    logoUrl: "",
+    behaviourFlags: {
+      allowLogin: true,
+      allowAnonymous: false,
+      allowTicketSubmission: true,
+      allowServiceRequests: true,
+      allowKnowledge: true,
+      allowDashboards: true,
+      showLegacy: true,
+      showTicketDetails: true,
+    },
+    menuToggles: {
+      "nav-home": true,
+      "nav-tickets": true,
+      "nav-ticket-details": true,
+      "nav-report": true,
+      "nav-request": true,
+      "nav-kb": true,
+      "nav-dash": true,
+      "nav-legacy": true,
+      "nav-onboarding": true,
+      "nav-dns": true,
+    },
+    customButtons: [],
+  };
+
   var widgetVisibility = {
     "hero-search": roles.map(function (r) { return r.id; }),
     "quick-actions": roles.map(function (r) { return r.id; }),
@@ -367,6 +402,61 @@
     return JSON.parse(JSON.stringify(value));
   }
 
+  function getPortalSettings() {
+    return clone(portalSettings);
+  }
+
+  function updatePortalSettings(updates) {
+    portalSettings = Object.assign({}, portalSettings, updates || {});
+    return getPortalSettings();
+  }
+
+  function setBehaviourFlag(flag, value) {
+    portalSettings.behaviourFlags[flag] = value;
+  }
+
+  function getBehaviourFlags() {
+    return clone(portalSettings.behaviourFlags);
+  }
+
+  function setNavToggle(navId, enabled) {
+    portalSettings.menuToggles[navId] = enabled;
+  }
+
+  function getNavToggles() {
+    return clone(portalSettings.menuToggles);
+  }
+
+  function addCustomNavButton() {
+    var nextIndex = portalSettings.customButtons.length + 1;
+    portalSettings.customButtons.push({
+      id: "custom-btn-" + nextIndex,
+      label: "Custom button " + nextIndex,
+      url: "https://example.com",
+      enabled: true,
+    });
+    return getCustomButtons();
+  }
+
+  function updateCustomNavButton(id, updates) {
+    var target = portalSettings.customButtons.find(function (btn) { return btn.id === id; });
+    if (!target) return getCustomButtons();
+    Object.assign(target, updates || {});
+    return getCustomButtons();
+  }
+
+  function removeCustomNavButton(id) {
+    var idx = portalSettings.customButtons.findIndex(function (btn) { return btn.id === id; });
+    if (idx > -1) {
+      portalSettings.customButtons.splice(idx, 1);
+    }
+    return getCustomButtons();
+  }
+
+  function getCustomButtons() {
+    return clone(portalSettings.customButtons || []);
+  }
+
   function getDefaultRole() {
     return roles[0].id;
   }
@@ -378,6 +468,22 @@
     });
   }
 
+  function isFeatureEnabledForPage(pageId) {
+    var flags = portalSettings.behaviourFlags;
+    if (pageId === "report-issue") return !!flags.allowTicketSubmission;
+    if (pageId === "service-catalog") return !!flags.allowServiceRequests;
+    if (pageId === "knowledge") return !!flags.allowKnowledge;
+    if (pageId === "dashboards") return !!flags.allowDashboards;
+    if (pageId === "legacy") return !!flags.showLegacy;
+    if (pageId === "ticket-details") return !!flags.showTicketDetails;
+    return true;
+  }
+
+  function isNavEnabled(item) {
+    if (portalSettings.menuToggles[item.id] === false) return false;
+    return isFeatureEnabledForPage(item.pageId || "");
+  }
+
   function normalizeWidgetRef(widgetId) {
     return {
       id: widgetId,
@@ -386,11 +492,28 @@
   }
 
   function getNavItems() {
+    var base = navItems.filter(isNavEnabled);
+    var custom = (portalSettings.customButtons || [])
+      .filter(function (btn) { return btn.enabled !== false; })
+      .map(function (btn) {
+        return {
+          id: btn.id,
+          label: btn.label,
+          route: btn.url,
+          pageId: null,
+          icon: "link",
+          visibleForRoles: roles.map(function (r) { return r.id; }),
+        };
+      });
+    return clone(base.concat(custom));
+  }
+
+  function getNavCatalog() {
     return clone(navItems);
   }
 
   function getNavItemsForRole(role) {
-    return clone(filterByRole(navItems, role));
+    return clone(filterByRole(getNavItems(), role));
   }
 
   function moveNavItem(itemId, delta) {
@@ -410,7 +533,10 @@
   }
 
   function getPagesForRole(role) {
-    return filterByRole(getPages(), role);
+    var enabledPages = getPages().filter(function (page) {
+      return isFeatureEnabledForPage(page.id);
+    });
+    return filterByRole(enabledPages, role);
   }
 
   function getPageById(id) {
@@ -573,6 +699,7 @@
   }
 
   function filterWidgetsForRole(widgets, role) {
+    var flags = portalSettings.behaviourFlags;
     return widgets
       .map(function (widget) {
         if (typeof widget === "string") {
@@ -588,6 +715,13 @@
             return globalRoles.indexOf(roleId) > -1;
           });
         }
+
+        if (widget.id === "issue-form" && !flags.allowTicketSubmission) return false;
+        if (widget.id === "service-catalog" && !flags.allowServiceRequests) return false;
+        if (widget.id.indexOf("kb-") === 0 && !flags.allowKnowledge) return false;
+        if (widget.id === "legacy-feedback" && !flags.showLegacy) return false;
+        if (widget.id === "insights-dashboard" && !flags.allowDashboards) return false;
+
         return rolesForWidget.indexOf(role) > -1;
       })
       .map(function (widget) {
@@ -603,6 +737,7 @@
 
   window.LayoutLibrary = {
     getNavItems: getNavItems,
+    getNavCatalog: getNavCatalog,
     getNavItemsForRole: getNavItemsForRole,
     moveNavItem: moveNavItem,
     getPages: getPages,
@@ -623,6 +758,16 @@
     updateWidgetConfig: updateWidgetConfig,
     getTicketViewForRole: getTicketViewForRole,
     getTicketPresets: getTicketPresets,
-    setTicketPresetForRole: setTicketPresetForRole
+    setTicketPresetForRole: setTicketPresetForRole,
+    getPortalSettings: getPortalSettings,
+    updatePortalSettings: updatePortalSettings,
+    setBehaviourFlag: setBehaviourFlag,
+    getBehaviourFlags: getBehaviourFlags,
+    setNavToggle: setNavToggle,
+    getNavToggles: getNavToggles,
+    addCustomNavButton: addCustomNavButton,
+    updateCustomNavButton: updateCustomNavButton,
+    removeCustomNavButton: removeCustomNavButton,
+    getCustomButtons: getCustomButtons,
   };
 })();

@@ -161,15 +161,17 @@ Notes:
 
 ## Phase 9 – Halo Settings Mapping & Config UI
 
-- [ ] 9.1 Halo Self Service Portal settings reviewed and enumerated
-- [ ] 9.2 `docs/halo-settings-map.md` created with categories, mapping, and coverage labels
-- [ ] 9.3 Admin console extended with fields/toggles for Halo settings
-- [ ] 9.4 Demo-influencing settings wired (title, welcome, colors, nav visibility, behaviour flags)
-- [ ] 9.5 Docs/progress updated with coverage notes
+- [x] 9.1 Halo Self Service Portal settings reviewed and enumerated
+- [x] 9.2 `docs/halo-settings-map.md` created with categories, mapping, and coverage labels
+- [x] 9.3 Admin console extended with fields/toggles for Halo settings
+- [x] 9.4 Demo-influencing settings wired (title, welcome, colors, nav visibility, behaviour flags)
+- [x] 9.5 Docs/progress updated with coverage notes
 
 Notes:
 
-- Settings mapping document has been drafted ahead of implementation; admin UI wiring and interactive settings will be tackled in Phase 9.
+- Refreshed the settings map to align with the official guide, marking which fields are wired (branding, hero text, navigation toggles, behaviour flags) versus documented placeholders.
+- Admin General and Branding sections now expose portal basics (title, welcome hero copy, badge), authentication/behaviour toggles, brand colour pickers, and logo initials/URL fields that immediately update the demo styling.
+- Navigation management gained enable/disable toggles per menu item plus fully functional custom buttons; behaviour flags hide related pages/widgets (e.g., report issue, catalog, knowledge, dashboards, legacy).
 
 ## Phase 10 – Advanced Page/Block Editor
 

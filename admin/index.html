@@ -49,34 +49,115 @@
     <section id="admin-section-general" class="admin-section admin-section--active stack">
       <div class="card">
         <h2 style="margin-top: 0;">Welcome</h2>
-        <p class="muted">
-          This console will eventually let you tailor the customer portal. Phase 1 provides a static shell for future controls.
-        </p>
+        <p class="muted">This console now mirrors the official Halo Self Service Portal settings with demo-friendly controls.</p>
       </div>
       <div class="admin-panels">
-        <div class="card">
-          <h3>Portal basics</h3>
-          <p class="muted">Set portal title, support email, and landing page preferences.</p>
-          <p class="helper-text">Coming in later phases.</p>
+        <div class="card stack">
+          <div class="section-header">
+            <div class="stack" style="gap: 4px;">
+              <h3 style="margin: 0;">Portal basics</h3>
+              <p class="muted" style="margin: 0;">Title, welcome copy, and banner text for the hero.</p>
+            </div>
+            <span class="pill">Brand + Content</span>
+          </div>
+          <label class="stack" style="gap: 0.25rem;">
+            <span class="list-row__title">Portal title</span>
+            <input id="portal-title-input" type="text" class="text-input" placeholder="Generic IT Support" />
+            <span class="helper-text">Shown in the portal header and document title.</span>
+          </label>
+          <label class="stack" style="gap: 0.25rem;">
+            <span class="list-row__title">Welcome headline</span>
+            <input id="portal-headline-input" type="text" class="text-input" placeholder="How can we help you today?" />
+            <span class="helper-text">Maps to the hero title in the Self Service portal.</span>
+          </label>
+          <label class="stack" style="gap: 0.25rem;">
+            <span class="list-row__title">Welcome message</span>
+            <textarea id="portal-message-input" class="text-input" rows="3" placeholder="Quickly raise issues, request services, and find answers."></textarea>
+          </label>
+          <label class="stack" style="gap: 0.25rem;">
+            <span class="list-row__title">Banner / hero badge</span>
+            <input id="portal-banner-input" type="text" class="text-input" placeholder="Portal Demo" />
+            <span class="helper-text">Use to surface environment labels or announcements.</span>
+          </label>
         </div>
-        <div class="card">
-          <h3>Announcements</h3>
-          <p class="muted">Surface important notices to end users on login.</p>
-          <p class="helper-text">Placeholder content.</p>
+        <div class="card stack">
+          <div class="section-header">
+            <div class="stack" style="gap: 4px;">
+              <h3 style="margin: 0;">Authentication & access</h3>
+              <p class="muted" style="margin: 0;">Allow logins, anonymous views, and behaviour flags.</p>
+            </div>
+            <span class="pill">Access control</span>
+          </div>
+          <div id="auth-settings" class="stack" style="gap: 0.5rem;"></div>
         </div>
-        <div class="card">
-          <h3>Localization</h3>
-          <p class="muted">Language packs and date/time formats.</p>
-          <p class="helper-text">Planned for a future phase.</p>
+        <div class="card stack">
+          <h3 style="margin: 0;">Localization</h3>
+          <p class="muted" style="margin: 0;">Language selection and date/time formatting.</p>
+          <div class="inline" style="flex-wrap: wrap; gap: 0.75rem;">
+            <label class="stack" style="gap: 0.25rem;">
+              <span class="list-row__title">Language</span>
+              <select class="text-input" disabled>
+                <option>English (default)</option>
+              </select>
+              <span class="helper-text">Documented only for now.</span>
+            </label>
+            <label class="stack" style="gap: 0.25rem;">
+              <span class="list-row__title">Timezone</span>
+              <select class="text-input" disabled>
+                <option>Browser local</option>
+              </select>
+            </label>
+          </div>
+          <p class="helper-text">Additional locales can be layered later to mirror Halo packs.</p>
         </div>
       </div>
     </section>
 
     <section id="admin-section-branding" class="admin-section stack">
-      <div class="card">
-        <h2 style="margin-top: 0;">Branding & Themes</h2>
-        <p class="muted">Light/dark themes, brand colors, and logos will be configurable here.</p>
-        <p class="helper-text">Theme editor arrives in Phase 2.</p>
+      <div class="card stack">
+        <div class="section-header">
+          <div class="stack" style="gap: 4px;">
+            <h2 style="margin: 0;">Branding & Themes</h2>
+            <p class="muted" style="margin: 0;">Manage logos, brand colours, and favicons.</p>
+          </div>
+          <span class="pill">Identity</span>
+        </div>
+        <div class="inline" style="flex-wrap: wrap; gap: 0.75rem;">
+          <label class="stack" style="gap: 0.25rem;">
+            <span class="list-row__title">Logo initials</span>
+            <input id="logo-text-input" type="text" class="text-input" placeholder="G" />
+            <span class="helper-text">Fallback mark when no image is provided.</span>
+          </label>
+          <label class="stack" style="gap: 0.25rem;">
+            <span class="list-row__title">Logo image URL</span>
+            <input id="logo-url-input" type="text" class="text-input" placeholder="https://example.com/logo.svg" />
+            <span class="helper-text">Optional; uses initials if empty.</span>
+          </label>
+        </div>
+        <div class="stack" style="gap: 0.75rem;">
+          <div class="list-row__title">Brand colours</div>
+          <div class="inline" style="gap: 1rem; flex-wrap: wrap;">
+            <label class="stack" style="gap: 0.25rem;">
+              <span class="muted">Primary</span>
+              <input id="primary-color-input" type="color" class="color-input" />
+            </label>
+            <label class="stack" style="gap: 0.25rem;">
+              <span class="muted">Accent</span>
+              <input id="accent-color-input" type="color" class="color-input" />
+            </label>
+            <label class="stack" style="gap: 0.25rem;">
+              <span class="muted">Header</span>
+              <input id="header-color-input" type="color" class="color-input" />
+            </label>
+          </div>
+          <p class="helper-text">These map to Halo's brand colour, accent, and header background settings.</p>
+        </div>
+        <div class="stack" style="gap: 0.5rem;">
+          <div class="list-row__title">Assets</div>
+          <p class="helper-text" style="margin: 0;">Favicon and custom CSS/JS are documented placeholders for now.</p>
+          <div class="pill pill--ghost">Favicon upload (documented)</div>
+          <div class="pill pill--ghost">Custom CSS / JS (documented)</div>
+        </div>
       </div>
     </section>
 
@@ -91,6 +172,18 @@
         </div>
         <div id="nav-manager-list" class="list-stack"></div>
         <p class="helper-text">Use the arrows to reprioritize navigation without drag-and-drop.</p>
+      </div>
+      <div class="card stack">
+        <div class="section-header">
+          <div class="stack" style="gap: 4px;">
+            <h3 style="margin: 0;">Menu buttons & behaviour</h3>
+            <p class="muted" style="margin: 0;">Toggle built-in menu items and add custom buttons.</p>
+          </div>
+          <span class="pill">Visibility + order</span>
+        </div>
+        <div id="nav-toggle-panel" class="list-stack"></div>
+        <div class="divider"></div>
+        <div id="custom-nav-panel" class="stack" style="gap: 0.5rem;"></div>
       </div>
       <div class="card stack">
         <h3 style="margin: 0;">Visibility presets</h3>

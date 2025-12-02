@@ -218,6 +218,16 @@ img {
   outline-offset: 1px;
 }
 
+.color-input {
+  width: 100%;
+  min-width: 160px;
+  height: 44px;
+  padding: 4px;
+  border-radius: 10px;
+  border: 1px solid var(--color-border-subtle);
+  background: var(--color-surface);
+}
+
 /* Cards */
 .card {
   background: var(--color-surface);
@@ -226,6 +236,11 @@ img {
   padding: var(--space-12);
   border: 1px solid var(--color-border-subtle);
   transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+}
+
+.divider {
+  border-top: 1px solid var(--color-border-subtle);
+  margin: var(--space-8) 0;
 }
 
 .card h3 {
@@ -313,6 +328,13 @@ img {
   font-size: var(--text-sm);
   color: var(--color-header-bg);
   box-shadow: var(--shadow-light);
+}
+
+.brand-mark--image {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-subtle);
+  color: transparent;
+  box-shadow: none;
 }
 
 .brand-name {

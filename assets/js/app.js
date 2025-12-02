@@ -5,6 +5,51 @@
   var currentRole = null;
   var currentPageId = "home";
 
+  function getPortalSettings() {
+    if (window.LayoutLibrary && window.LayoutLibrary.getPortalSettings) {
+      return window.LayoutLibrary.getPortalSettings();
+    }
+    return null;
+  }
+
+  function applyBrandTokens(settings) {
+    if (!settings) return;
+    var root = document.documentElement;
+    if (settings.primaryColor) root.style.setProperty("--color-primary", settings.primaryColor);
+    if (settings.accentColor) root.style.setProperty("--color-accent", settings.accentColor);
+    if (settings.headerColor) root.style.setProperty("--color-header-bg", settings.headerColor);
+  }
+
+  function applyBranding() {
+    var settings = getPortalSettings();
+    if (!settings) return;
+    var markEls = document.querySelectorAll(".brand-mark");
+    var nameEls = document.querySelectorAll(".brand-name");
+
+    applyBrandTokens(settings);
+
+    nameEls.forEach(function (el) {
+      el.textContent = settings.portalTitle || "Halo Portal";
+    });
+
+    var markText = settings.logoText || (settings.portalTitle ? settings.portalTitle[0] : "H");
+    markEls.forEach(function (el) {
+      el.textContent = markText;
+      el.classList.toggle("brand-mark--image", !!settings.logoUrl);
+      if (settings.logoUrl) {
+        el.style.backgroundImage = "url(" + settings.logoUrl + ")";
+        el.style.backgroundSize = "cover";
+        el.style.backgroundPosition = "center";
+      } else {
+        el.style.backgroundImage = "";
+      }
+    });
+
+    if (settings.portalTitle) {
+      document.title = settings.portalTitle + " – Halo Portal UX Demo";
+    }
+  }
+
   function updateToggleLabels(theme) {
     var buttons = document.querySelectorAll('[data-role="theme-toggle"]');
     buttons.forEach(function (btn) {
@@ -245,10 +290,15 @@
       link.className = "nav-link" + (isActive ? " nav-link--active" : "");
       link.dataset.pageId = item.pageId || "";
       link.textContent = item.label;
-      link.addEventListener("click", function (event) {
-        event.preventDefault();
-        setActivePage(item.pageId || currentPageId);
-      });
+      if (item.pageId) {
+        link.addEventListener("click", function (event) {
+          event.preventDefault();
+          setActivePage(item.pageId || currentPageId);
+        });
+      } else {
+        link.target = "_blank";
+        link.rel = "noreferrer";
+      }
       nav.appendChild(link);
     });
   }
@@ -275,6 +325,8 @@
     var pageMeta = window.LayoutLibrary.getPageById
       ? window.LayoutLibrary.getPageById(pageId)
       : null;
+
+    var portalSettings = getPortalSettings();
 
     var renderWidgets = function () {
       var layout = window.LayoutLibrary.getLayoutForRole(pageId, role);
@@ -335,7 +387,8 @@
               ticketView: window.LayoutLibrary.getTicketViewForRole(role),
               config: window.LayoutLibrary.getWidgetConfig(widget.id),
               navigate: setActivePage,
-              pageId: pageId
+              pageId: pageId,
+              portalSettings: portalSettings,
             };
             window.WidgetSystem.renderWidget(widget.id, widgetContainer, options);
           });
@@ -391,6 +444,7 @@
 
   function initPortal() {
     applyStoredTheme();
+    applyBranding();
     wireThemeButton("theme-toggle");
     var startingRole = applyStoredRole();
     wireRolePicker("role-select");
@@ -406,6 +460,7 @@
 
   function initAdmin() {
     applyStoredTheme();
+    applyBranding();
     wireThemeButton("admin-theme-toggle");
     applyStoredRole();
     wireRolePicker("admin-role-select");
@@ -422,7 +477,8 @@
       return currentRole || (firstRole ? firstRole.id : "end_user");
     },
     setRole: setRole,
-    getRoles: getAvailableRoles
+    getRoles: getAvailableRoles,
+    applyBranding: applyBranding,
   };
 
   window.initPortal = initPortal;

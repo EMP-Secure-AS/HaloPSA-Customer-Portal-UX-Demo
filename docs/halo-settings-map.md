@@ -12,9 +12,9 @@ This file maps the official Halo Self Service Portal settings (per https://useha
 | --- | --- | --- | --- |
 | Portal title | General → Portal basics | Text input | Fully implemented in the demo |
 | Welcome message / hero text | General → Portal basics | Textarea | Fully implemented in the demo |
-| Logo | Branding & Themes | File picker (placeholder) | Partially represented (visual only) |
+| Logo | Branding & Themes | URL or initials input | Fully implemented in the demo |
 | Favicon | Branding & Themes | File picker (placeholder) | Documented only |
-| Primary/secondary colours | Branding & Themes | Color pickers | Partially represented (visual only) |
+| Primary/secondary colours | Branding & Themes | Color pickers | Fully implemented in the demo |
 | Background/heading colours | Branding & Themes | Color pickers | Partially represented (visual only) |
 | Custom CSS | Developer Tools | Textarea | Documented only |
 | Custom JavaScript | Developer Tools | Textarea | Documented only |
@@ -43,7 +43,7 @@ This file maps the official Halo Self Service Portal settings (per https://useha
 | Enable/disable Knowledge Base | Navigation | Visibility toggles per role | Fully implemented in the demo |
 | Enable/disable Dashboards | Navigation | Visibility toggles per role | Fully implemented in the demo |
 | Enable/disable Feedback/Old Tickets | Navigation | Visibility toggles per role | Fully implemented in the demo |
-| Custom menu buttons (URL / action) | Navigation | Row with label + URL inputs | Partially represented (visual only) |
+| Custom menu buttons (URL / action) | Navigation | Row with label + URL inputs | Fully implemented in the demo |
 | Menu order | Navigation | Up/Down reorder buttons | Fully implemented in the demo |
 | Role-based menu visibility | Navigation | Per-role checkboxes | Fully implemented in the demo |
 
@@ -53,10 +53,10 @@ This file maps the official Halo Self Service Portal settings (per https://useha
 | --- | --- | --- | --- |
 | Default landing page | Pages | Dropdown | Partially represented (visual only) |
 | Enable ticket details view | Pages | Toggle | Fully implemented in the demo |
-| Enable report issue page | Pages | Toggle | Fully implemented in the demo |
-| Enable service catalog | Pages | Toggle | Fully implemented in the demo |
-| Enable knowledge base | Pages | Toggle | Fully implemented in the demo |
-| Enable dashboards | Pages | Toggle | Fully implemented in the demo |
+| Enable report issue page | Pages | Toggle | Fully implemented in the demo (wires nav/widgets) |
+| Enable service catalog | Pages | Toggle | Fully implemented in the demo (wires nav/widgets) |
+| Enable knowledge base | Pages | Toggle | Fully implemented in the demo (wires nav/widgets) |
+| Enable dashboards | Pages | Toggle | Fully implemented in the demo (wires nav/widgets) |
 | Enable legacy/feedback page | Pages | Toggle | Fully implemented in the demo |
 | Page layout builder | Pages | Layout editor (rows/columns/widgets) | Fully implemented in the demo |
 | Page-level role visibility | Pages | Role checkboxes | Fully implemented in the demo |
