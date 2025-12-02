@@ -1,4 +1,11 @@
 {
-  "core": [],
+  "core": [
+    { "id": "hero-search", "name": "Hero Search", "description": "Search-focused hero with quick prompts." },
+    { "id": "quick-actions", "name": "Quick Actions", "description": "Entry points for common service actions." },
+    { "id": "recent-tickets", "name": "Recent Tickets", "description": "List of the latest support requests." },
+    { "id": "news", "name": "News", "description": "Company or IT news feed." },
+    { "id": "service-status", "name": "Service Status", "description": "Current health of key services." },
+    { "id": "top-articles", "name": "Top Articles", "description": "Frequently used knowledge base content." }
+  ],
   "custom": []
 }

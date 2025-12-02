@@ -63,15 +63,17 @@ Notes:
 
 ## Phase 3 – Widget System (Registry + Basic Widgets)
 
-- [ ] 3.1 `widgets/registry.json` created
-- [ ] 3.2 `assets/js/widgets.js` with registry + `renderWidget` implemented
-- [ ] 3.3 `portal/index.html` uses widget containers + renderer
-- [ ] 3.4 Mock data added for widgets
-- [ ] 3.5 Progress updated
+- [x] 3.1 `widgets/registry.json` created
+- [x] 3.2 `assets/js/widgets.js` with registry + `renderWidget` implemented
+- [x] 3.3 `portal/index.html` uses widget containers + renderer
+- [x] 3.4 Mock data added for widgets
+- [x] 3.5 Progress updated
 
 Notes:
 
-- _No work has been logged yet._
+- Added core widget registry entries for hero search, quick actions, service status, news, top articles, and recent tickets.
+- Introduced `assets/js/widgets.js` with a simple renderer registry, helper UI builders, and a loader for the registry JSON.
+- Portal homepage now declares widget slots and hydrates them via the widget system during `initPortal()`.
 
 ---
 
