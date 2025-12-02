@@ -535,6 +535,118 @@ img {
   font-size: var(--text-sm);
 }
 
+/* Admin utilities */
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-8);
+}
+
+.list-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.list-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-8);
+  padding: var(--space-8);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 12px;
+  background: var(--color-surface-muted);
+}
+
+.list-row__main {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.list-row__title {
+  font-weight: 700;
+}
+
+.list-row__meta {
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}
+
+.list-row__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.btn-icon {
+  padding: var(--space-4) var(--space-6);
+  border-radius: 10px;
+  min-width: 36px;
+}
+
+.btn-compact {
+  padding: var(--space-4) var(--space-8);
+  font-size: var(--text-xs);
+}
+
+.layout-row {
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 12px;
+  background: var(--color-surface);
+  box-shadow: var(--shadow-light);
+  padding: var(--space-8);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.layout-row__label {
+  font-weight: 700;
+}
+
+.layout-row__columns {
+  display: flex;
+  gap: var(--space-6);
+  flex-wrap: wrap;
+}
+
+.layout-col {
+  border: 1px dashed var(--color-border-subtle);
+  border-radius: 12px;
+  padding: var(--space-6);
+  background: var(--color-surface-muted);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  flex-grow: 1;
+}
+
+.layout-col__header {
+  font-weight: 600;
+  font-size: var(--text-sm);
+}
+
+.layout-col__body {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-6);
+}
+
+.widget-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-4) var(--space-8);
+  border-radius: var(--radius-pill);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-subtle);
+  box-shadow: var(--shadow-light);
+  font-weight: 600;
+}
+
 /* Utility */
 .small-text {
   font-size: var(--text-sm);
