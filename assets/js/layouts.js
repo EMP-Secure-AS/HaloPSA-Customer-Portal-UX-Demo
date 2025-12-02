@@ -14,7 +14,8 @@
     { id: "recent-tickets", name: "My Tickets", description: "Latest support requests" },
     { id: "news", name: "News", description: "IT or company news feed" },
     { id: "service-status", name: "Service Status", description: "Health of core services" },
-    { id: "top-articles", name: "Top Articles", description: "Frequently used KB content" }
+    { id: "top-articles", name: "Top Articles", description: "Frequently used KB content" },
+    { id: "dns-manager", name: "DNS Manager", description: "Manage DNS zones and records" }
   ];
 
   var widgetVisibility = {
@@ -23,7 +24,16 @@
     "recent-tickets": roles.map(function (r) { return r.id; }),
     news: roles.map(function (r) { return r.id; }),
     "service-status": ["end_user", "manager", "local_it", "company_it", "group_it"],
-    "top-articles": roles.map(function (r) { return r.id; })
+    "top-articles": roles.map(function (r) { return r.id; }),
+    "dns-manager": ["local_it", "company_it", "group_it"]
+  };
+
+  var widgetConfigs = {
+    "dns-manager": {
+      providerName: "Acme DNS Cloud",
+      apiBaseUrl: "https://api.dns.example.com",
+      defaultDomain: "acme.com"
+    }
   };
 
   var ticketPresets = {
@@ -56,7 +66,8 @@
     { id: "nav-tickets", label: "My Tickets", route: "/portal/tickets", icon: "ticket", visibleForRoles: roles.map(function (r) { return r.id; }) },
     { id: "nav-kb", label: "Knowledge Base", route: "/portal/kb", icon: "book", visibleForRoles: roles.map(function (r) { return r.id; }) },
     { id: "nav-dash", label: "Dashboards", route: "/portal/dashboards", icon: "chart", visibleForRoles: ["manager", "local_it", "company_it", "group_it"] },
-    { id: "nav-onboarding", label: "Onboarding Hub", route: "/portal/onboarding", icon: "sparkles", visibleForRoles: ["end_user", "manager"] }
+    { id: "nav-onboarding", label: "Onboarding Hub", route: "/portal/onboarding", icon: "sparkles", visibleForRoles: ["end_user", "manager"] },
+    { id: "nav-dns", label: "DNS Manager", route: "/portal/dns", icon: "globe", visibleForRoles: ["local_it", "company_it", "group_it"] }
   ];
 
   var pages = [
@@ -64,7 +75,8 @@
     { id: "tickets", name: "My Tickets", route: "/portal/tickets", type: "core", status: "Published", visibleForRoles: roles.map(function (r) { return r.id; }) },
     { id: "knowledge", name: "Knowledge Base", route: "/portal/kb", type: "core", status: "Published", visibleForRoles: roles.map(function (r) { return r.id; }) },
     { id: "dashboards", name: "Dashboards", route: "/portal/dashboards", type: "core", status: "Draft", visibleForRoles: ["manager", "local_it", "company_it", "group_it"] },
-    { id: "onboarding", name: "Onboarding Hub", route: "/portal/onboarding", type: "custom", status: "Published", visibleForRoles: ["end_user", "manager"] }
+    { id: "onboarding", name: "Onboarding Hub", route: "/portal/onboarding", type: "custom", status: "Published", visibleForRoles: ["end_user", "manager"] },
+    { id: "dns", name: "DNS Manager", route: "/portal/dns", type: "custom", status: "Published", visibleForRoles: ["local_it", "company_it", "group_it"] }
   ];
 
   var pageLayouts = {
@@ -103,6 +115,21 @@
             { width: 4, widgets: [{ id: "service-status", visibleForRoles: widgetVisibility["service-status"] }] },
             { width: 4, widgets: [{ id: "news", visibleForRoles: widgetVisibility.news }] },
             { width: 4, widgets: [{ id: "top-articles", visibleForRoles: widgetVisibility["top-articles"] }] }
+          ]
+        },
+        {
+          id: "row-dns",
+          label: "DNS management",
+          columns: [
+            {
+              width: 12,
+              widgets: [
+                {
+                  id: "dns-manager",
+                  visibleForRoles: widgetVisibility["dns-manager"],
+                }
+              ]
+            }
           ]
         },
         {
@@ -197,6 +224,27 @@
               ]
             },
             { width: 4, widgets: [{ id: "service-status", visibleForRoles: widgetVisibility["service-status"] }] }
+          ]
+        }
+      ]
+    },
+    dns: {
+      id: "dns",
+      title: "DNS Manager",
+      rows: [
+        {
+          id: "row-dns-overview",
+          label: "DNS zones",
+          columns: [
+            {
+              width: 12,
+              widgets: [
+                {
+                  id: "dns-manager",
+                  visibleForRoles: widgetVisibility["dns-manager"],
+                }
+              ]
+            }
           ]
         }
       ]
@@ -333,6 +381,36 @@
     }
   }
 
+  function registerCustomWidgets(manifests) {
+    (manifests || []).forEach(function (manifest) {
+      var existing = widgetLibrary.find(function (w) {
+        return w.id === manifest.id;
+      });
+      if (existing) {
+        existing.name = manifest.name || existing.name;
+        existing.description = manifest.description || existing.description;
+      } else {
+        widgetLibrary.push({
+          id: manifest.id,
+          name: manifest.name || manifest.id,
+          description: manifest.description || "Custom widget",
+        });
+      }
+
+      if (manifest.visibleForRoles && manifest.visibleForRoles.length) {
+        widgetVisibility[manifest.id] = manifest.visibleForRoles.slice();
+      } else if (!widgetVisibility[manifest.id]) {
+        widgetVisibility[manifest.id] = roles.map(function (r) {
+          return r.id;
+        });
+      }
+
+      if (manifest.config) {
+        widgetConfigs[manifest.id] = Object.assign({}, widgetConfigs[manifest.id] || {}, manifest.config);
+      }
+    });
+  }
+
   function getWidgetLibrary() {
     return clone(widgetLibrary);
   }
@@ -343,6 +421,15 @@
 
   function getWidgetVisibility() {
     return clone(widgetVisibility);
+  }
+
+  function getWidgetConfig(widgetId) {
+    return clone(widgetConfigs[widgetId] || {});
+  }
+
+  function updateWidgetConfig(widgetId, updates) {
+    var current = widgetConfigs[widgetId] || {};
+    widgetConfigs[widgetId] = Object.assign({}, current, updates);
   }
 
   function getTicketPresetForRole(role) {
@@ -406,10 +493,13 @@
     addWidgetToPage: addWidgetToPage,
     removeWidgetFromPage: removeWidgetFromPage,
     getWidgetLibrary: getWidgetLibrary,
+    registerCustomWidgets: registerCustomWidgets,
     getRoles: getRoles,
     getDefaultRole: getDefaultRole,
     setWidgetVisibility: setWidgetVisibility,
     getWidgetVisibility: getWidgetVisibility,
+    getWidgetConfig: getWidgetConfig,
+    updateWidgetConfig: updateWidgetConfig,
     getTicketViewForRole: getTicketViewForRole,
     getTicketPresets: getTicketPresets,
     setTicketPresetForRole: setTicketPresetForRole

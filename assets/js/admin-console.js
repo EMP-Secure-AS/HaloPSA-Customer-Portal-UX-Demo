@@ -8,6 +8,7 @@
   var widgetVisibilityEl;
   var ticketOverridesEl;
   var roleCatalogEl;
+  var dnsConfigEl;
   var widgetLibrary = [];
   var selectedPageId = null;
   var roles = [];
@@ -353,6 +354,7 @@
           window.LayoutLibrary.setWidgetVisibility(widget.id, updated);
           visibility = window.LayoutLibrary.getWidgetVisibility();
           renderLayoutEditor();
+          renderDnsConfigPanel();
         });
         var text = document.createElement("span");
         text.textContent = role.label;
@@ -365,6 +367,104 @@
       row.appendChild(actions);
       widgetVisibilityEl.appendChild(row);
     });
+  }
+
+  function renderDnsConfigPanel() {
+    if (!dnsConfigEl) return;
+    var config = window.LayoutLibrary.getWidgetConfig("dns-manager");
+    var visibility = window.LayoutLibrary.getWidgetVisibility();
+    var dnsRoles = visibility["dns-manager"] || [];
+    dnsConfigEl.innerHTML = "";
+
+    function createTextField(labelText, value, placeholder, onChange) {
+      var field = document.createElement("label");
+      field.className = "stack";
+      field.style.gap = "0.25rem";
+      var title = document.createElement("div");
+      title.className = "list-row__title";
+      title.textContent = labelText;
+      var input = document.createElement("input");
+      input.type = "text";
+      input.className = "text-input";
+      input.value = value || "";
+      if (placeholder) input.placeholder = placeholder;
+      input.addEventListener("input", function (event) {
+        onChange(event.target.value);
+      });
+      field.appendChild(title);
+      field.appendChild(input);
+      return field;
+    }
+
+    dnsConfigEl.appendChild(
+      createTextField("Provider name", config.providerName, "e.g. Acme DNS Cloud", function (value) {
+        window.LayoutLibrary.updateWidgetConfig("dns-manager", { providerName: value });
+      })
+    );
+
+    dnsConfigEl.appendChild(
+      createTextField("API base URL", config.apiBaseUrl, "https://api.dns.example.com", function (value) {
+        window.LayoutLibrary.updateWidgetConfig("dns-manager", { apiBaseUrl: value });
+      })
+    );
+
+    dnsConfigEl.appendChild(
+      createTextField("Default domain filter", config.defaultDomain, "acme.com", function (value) {
+        window.LayoutLibrary.updateWidgetConfig("dns-manager", { defaultDomain: value });
+      })
+    );
+
+    var rolesWrapper = document.createElement("div");
+    rolesWrapper.className = "stack";
+    rolesWrapper.style.gap = "0.25rem";
+    var rolesLabel = document.createElement("div");
+    rolesLabel.className = "list-row__title";
+    rolesLabel.textContent = "Role access";
+    var helper = document.createElement("div");
+    helper.className = "helper-text";
+    helper.textContent = "Only selected roles will see the DNS Manager widget.";
+    rolesWrapper.appendChild(rolesLabel);
+    rolesWrapper.appendChild(helper);
+
+    var roleList = document.createElement("div");
+    roleList.className = "inline";
+    roleList.style.flexWrap = "wrap";
+    roleList.style.gap = "0.5rem";
+
+    roles.forEach(function (role) {
+      var label = document.createElement("label");
+      label.className = "checkbox";
+      var input = document.createElement("input");
+      input.type = "checkbox";
+      input.value = role.id;
+      input.checked = dnsRoles.indexOf(role.id) > -1;
+      input.addEventListener("change", function () {
+        var currentRoles = new Set(dnsRoles);
+        if (input.checked) {
+          currentRoles.add(role.id);
+        } else {
+          currentRoles.delete(role.id);
+        }
+        var updatedRoles = Array.from(currentRoles);
+        window.LayoutLibrary.setWidgetVisibility("dns-manager", updatedRoles);
+        dnsRoles = updatedRoles;
+        renderWidgetVisibilityControls();
+      });
+      var text = document.createElement("span");
+      text.textContent = role.label;
+      label.appendChild(input);
+      label.appendChild(text);
+      roleList.appendChild(label);
+    });
+
+    rolesWrapper.appendChild(roleList);
+    dnsConfigEl.appendChild(rolesWrapper);
+
+    var summary = document.createElement("div");
+    summary.className = "helper-text";
+    summary.textContent =
+      "Configurable mock widget; settings are stored client-side for demo purposes.";
+    dnsConfigEl.appendChild(summary);
   }
 
   function renderTicketRoleOverrides() {
@@ -458,6 +558,7 @@
     widgetVisibilityEl = document.getElementById("widget-visibility-table");
     ticketOverridesEl = document.getElementById("ticket-role-overrides");
     roleCatalogEl = document.getElementById("role-catalog");
+    dnsConfigEl = document.getElementById("dns-config");
   }
 
   function initAdminConsole() {
@@ -469,10 +570,22 @@
     renderPageList();
     renderLayoutEditor();
     renderWidgetVisibilityControls();
+    renderDnsConfigPanel();
     renderTicketRoleOverrides();
     renderRoleCatalog();
     wireAddPage();
     wirePageSelect();
+
+    if (window.WidgetSystem && window.WidgetSystem.loadWidgetRegistry) {
+      window.WidgetSystem.loadWidgetRegistry().then(function (registryData) {
+        if (registryData && registryData.customManifests && window.LayoutLibrary.registerCustomWidgets) {
+          window.LayoutLibrary.registerCustomWidgets(registryData.customManifests);
+          widgetLibrary = window.LayoutLibrary.getWidgetLibrary();
+          renderWidgetVisibilityControls();
+          renderDnsConfigPanel();
+        }
+      });
+    }
   }
 
   window.AdminConsole = {
@@ -481,6 +594,8 @@
       renderNavManager();
       renderPageList();
       renderLayoutEditor();
+      renderWidgetVisibilityControls();
+      renderDnsConfigPanel();
       renderRoleCatalog();
     }
   };

@@ -114,16 +114,18 @@ Notes:
 
 ## Phase 6 – Custom Widgets & DNS Manager Example
 
-- [ ] 6.1 Widget manifest format defined
-- [ ] 6.2 Loader for core + custom widgets implemented
-- [ ] 6.3 DNS Manager widget created (mock data)
-- [ ] 6.4 Admin config UI for DNS Manager
-- [ ] 6.5 Role visibility respected for DNS widget
-- [ ] 6.6 Progress updated
+- [x] 6.1 Widget manifest format defined
+- [x] 6.2 Loader for core + custom widgets implemented
+- [x] 6.3 DNS Manager widget created (mock data)
+- [x] 6.4 Admin config UI for DNS Manager
+- [x] 6.5 Role visibility respected for DNS widget
+- [x] 6.6 Progress updated
 
 Notes:
 
-- _No work has been logged yet._
+- Added manifest-driven custom widget loading with `widgets/registry.json` pointing to per-widget `manifest.json` files; loader fetches manifests, injects components, and exposes metadata for the admin library.
+- Created DNS Manager custom widget (domains + records mock data) with role-aware visibility defaults, manifest metadata, and reusable styles; placed on the home layout and a dedicated DNS page for IT roles.
+- Admin console now loads custom manifests, includes DNS-specific configuration (provider/API/default domain) plus role access controls that sync with global widget visibility settings.
 
 ---
 

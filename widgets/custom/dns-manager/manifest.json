@@ -1,0 +1,13 @@
+{
+  "id": "dns-manager",
+  "name": "DNS Manager",
+  "icon": "globe",
+  "description": "Manage DNS zones and records from within the portal.",
+  "entry": "component.js",
+  "visibleForRoles": ["local_it", "company_it", "group_it"],
+  "config": {
+    "providerName": "Acme DNS Cloud",
+    "apiBaseUrl": "https://api.dns.example.com",
+    "defaultDomain": "acme.com"
+  }
+}
