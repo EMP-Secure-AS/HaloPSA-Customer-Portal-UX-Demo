@@ -13,13 +13,9 @@
       <span class="brand-mark">G</span>
       <span class="brand-name">Generic IT Support</span>
     </div>
-    <nav class="app-header__nav">
-      <a href="./index.html" class="nav-link nav-link--active">Home</a>
-      <a href="#" class="nav-link">My Tickets</a>
-      <a href="#" class="nav-link">Knowledge Base</a>
-      <a href="#" class="nav-link">Dashboards</a>
-    </nav>
+    <nav id="portal-nav" class="app-header__nav"></nav>
     <div class="app-header__actions">
+      <select id="role-select" class="role-select" aria-label="Preview as role"></select>
       <button id="theme-toggle" data-role="theme-toggle" class="btn btn-ghost">Dark mode</button>
       <div class="avatar-pill">
         <span class="avatar-pill__initials">JD</span>
@@ -28,23 +24,10 @@
   </header>
 
   <main class="app-main">
-    <div class="container stack">
-      <section class="page-section" data-widget-id="hero-search"></section>
-
-      <section class="page-section card" data-widget-id="quick-actions"></section>
-
-      <section class="page-section">
-        <div class="card-grid">
-          <article class="card" data-widget-id="service-status"></article>
-          <article class="card" data-widget-id="news"></article>
-          <article class="card" data-widget-id="top-articles"></article>
-        </div>
-      </section>
-
-      <section class="page-section card" data-widget-id="recent-tickets"></section>
-    </div>
+    <div id="portal-content" class="container stack"></div>
   </main>
 
+  <script src="../assets/js/layouts.js"></script>
   <script src="../assets/js/widgets.js"></script>
   <script src="../assets/js/app.js"></script>
   <script>

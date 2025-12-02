@@ -149,6 +149,15 @@ img {
   border: 1px solid var(--color-border-contrast);
 }
 
+.role-select {
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-pill);
+  padding: var(--space-6) var(--space-8);
+  background: var(--color-surface);
+  color: var(--color-text-main);
+  font-weight: 600;
+}
+
 /* Cards */
 .card {
   background: var(--color-surface);
@@ -262,6 +271,20 @@ img {
   padding: var(--space-16) 0;
 }
 
+.portal-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-12);
+}
+
+.portal-col {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  flex: 1;
+  min-width: 260px;
+}
+
 .hero {
   background: radial-gradient(circle at 20% 20%, rgba(18, 196, 173, 0.15), transparent 35%),
     radial-gradient(circle at 80% 0%, rgba(19, 99, 223, 0.2), transparent 30%),
@@ -364,6 +387,22 @@ img {
   font-size: var(--text-xs);
 }
 
+.pill--ghost {
+  background: transparent;
+  border-style: dashed;
+}
+
+.checkbox {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-4);
+  font-weight: 600;
+}
+
+.checkbox input[type="checkbox"] {
+  accent-color: var(--color-primary);
+}
+
 .status-pill {
   display: inline-flex;
   align-items: center;
@@ -415,6 +454,34 @@ img {
   display: flex;
   flex-direction: column;
   gap: var(--space-6);
+}
+
+.ticket-table {
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--color-surface);
+}
+
+.ticket-table__row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: var(--space-6);
+  padding: var(--space-6) var(--space-8);
+  border-bottom: 1px solid var(--color-border-subtle);
+}
+
+.ticket-table__row:last-child {
+  border-bottom: none;
+}
+
+.ticket-table__row--head {
+  background: var(--color-surface-muted);
+  font-weight: 700;
+}
+
+.ticket-table__cell {
+  font-size: var(--text-sm);
 }
 
 .ticket-row {

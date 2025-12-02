@@ -96,16 +96,19 @@ Notes:
 
 ## Phase 5 – Role‑Aware Behaviour
 
-- [ ] 5.1 Role model and "preview as role" added
-- [ ] 5.2 Visibility rules added to page/widget models
-- [ ] 5.3 Portal respects role visibility on render
-- [ ] 5.4 Role‑aware My Tickets widget behaviour implemented
-- [ ] 5.5 Admin UI to configure role visibility/overrides
-- [ ] 5.6 Progress updated
+- [x] 5.1 Role model and "preview as role" added
+- [x] 5.2 Visibility rules added to page/widget models
+- [x] 5.3 Portal respects role visibility on render
+- [x] 5.4 Role‑aware My Tickets widget behaviour implemented
+- [x] 5.5 Admin UI to configure role visibility/overrides
+- [x] 5.6 Progress updated
 
 Notes:
 
-- _No work has been logged yet._
+- Added shared role catalogue (`end_user`, `manager`, `local_it`, `company_it`, `group_it`) with a persistent "preview as role" selector in both portal and admin headers.
+- Navigation, pages, and layouts now store per-role visibility rules; portal rendering filters nav items and widget slots based on the active role.
+- My Tickets widget has role-aware presets (summary vs. operations view with extra columns/filters) and reflects the active role badge.
+- Admin console includes controls to toggle widget visibility per role, choose My Tickets presets per role, and a role catalog panel that refreshes when preview role changes.
 
 ---
 

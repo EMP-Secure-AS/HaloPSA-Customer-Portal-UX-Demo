@@ -32,6 +32,7 @@
         <p class="muted" style="margin: 0;">Configure navigation, pages, widgets, and roles for the portal experience.</p>
       </div>
       <div class="admin-main__actions">
+        <select id="admin-role-select" class="role-select" aria-label="Preview portal as role"></select>
         <button id="admin-theme-toggle" data-role="theme-toggle" class="btn btn-secondary">Dark mode</button>
       </div>
     </header>
@@ -120,18 +121,41 @@
     </section>
 
     <section id="admin-section-widgets" class="admin-section stack">
-      <div class="card">
-        <h2 style="margin-top: 0;">Widgets</h2>
-        <p class="muted">Browse the widget library and configure options.</p>
-        <p class="helper-text">Widget registry and rendering arrive in Phase 3.</p>
+      <div class="card stack">
+        <div class="section-header">
+          <div class="stack" style="gap: 4px;">
+            <h2 style="margin: 0;">Widgets</h2>
+            <p class="muted" style="margin: 0;">Browse the widget library and configure role visibility.</p>
+          </div>
+          <span class="pill">Role-aware controls</span>
+        </div>
+        <div id="widget-visibility-table" class="list-stack"></div>
+        <p class="helper-text">Unchecking a role hides that widget on portal pages for the selected audience.</p>
+      </div>
+
+      <div class="card stack">
+        <div class="section-header">
+          <div class="stack" style="gap: 4px;">
+            <h3 style="margin: 0;">My Tickets overrides</h3>
+            <p class="muted" style="margin: 0;">Choose which columns each role sees in the My Tickets widget.</p>
+          </div>
+          <span class="pill">Role presets</span>
+        </div>
+        <div id="ticket-role-overrides" class="list-stack"></div>
       </div>
     </section>
 
     <section id="admin-section-roles" class="admin-section stack">
-      <div class="card">
-        <h2 style="margin-top: 0;">Roles & Visibility</h2>
-        <p class="muted">Manage which pages and widgets each audience can see.</p>
-        <p class="helper-text">Role-aware controls will be wired in Phase 5.</p>
+      <div class="card stack">
+        <div class="section-header">
+          <div class="stack" style="gap: 4px;">
+            <h2 style="margin: 0;">Roles & Visibility</h2>
+            <p class="muted" style="margin: 0;">Preview audiences and the experience they receive.</p>
+          </div>
+          <span class="pill">Preview as role</span>
+        </div>
+        <div id="role-catalog" class="list-stack"></div>
+        <p class="helper-text">Role selection updates navigation, page layouts, and My Tickets configurations across the demo.</p>
       </div>
     </section>
 
