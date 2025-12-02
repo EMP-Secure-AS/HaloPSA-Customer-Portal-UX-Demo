@@ -47,15 +47,17 @@ Notes:
 
 ## Phase 2 – Theme System (Light/Dark + Brand Colors)
 
-- [ ] 2.1 Core CSS variables defined
-- [ ] 2.2 Light/dark theme selectors implemented
-- [ ] 2.3 Theme toggle in JS implemented
-- [ ] 2.4 Theme toggle wired into portal and admin headers
-- [ ] 2.5 Progress updated
+- [x] 2.1 Core CSS variables defined
+- [x] 2.2 Light/dark theme selectors implemented
+- [x] 2.3 Theme toggle in JS implemented
+- [x] 2.4 Theme toggle wired into portal and admin headers
+- [x] 2.5 Progress updated
 
 Notes:
 
-- _No work has been logged yet._
+- Expanded base tokens to include header/sidebar colors, border contrast, and added dark theme overrides using the `data-theme` attribute.
+- Updated shared styles to rely on the tokenized palette for headers, cards, navigation, and admin shell backgrounds.
+- Theme toggle now updates labels/ARIA state, reads/saves preferences in `localStorage`, and is exposed in both portal and admin headers.
 
 ---
 
