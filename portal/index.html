@@ -13,7 +13,15 @@
       <span class="brand-mark">G</span>
       <span class="brand-name">Generic IT Support</span>
     </div>
-    <nav id="portal-nav" class="app-header__nav"></nav>
+    <button
+      id="portal-menu-toggle"
+      class="icon-button nav-toggle"
+      aria-expanded="false"
+      aria-controls="portal-nav"
+    >
+      Menu
+    </button>
+    <nav id="portal-nav" class="app-header__nav app-header__nav--collapsible"></nav>
     <div class="app-header__actions">
       <select id="role-select" class="role-select" aria-label="Preview as role"></select>
       <button id="theme-toggle" data-role="theme-toggle" class="btn btn-ghost">Dark mode</button>

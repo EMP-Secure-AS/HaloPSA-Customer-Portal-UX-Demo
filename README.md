@@ -38,6 +38,26 @@ Folders:
 
 You can open the raw HTML files locally or host on GitHub Pages as a static site.
 
+## Running / viewing the demo
+
+Because everything is static HTML/JS/CSS, you can view the demo without any build tools:
+
+- Open `portal/index.html` or `admin/index.html` directly in your browser **or**
+- Run a lightweight server from the repo root:
+
+  ```bash
+  python3 -m http.server 8000
+  ```
+
+  Then visit `http://localhost:8000/portal/` and `http://localhost:8000/admin/`.
+
+## Feature overview
+
+- **Widget system:** Widgets are registered in `widgets/registry.json` and rendered via `assets/js/widgets.js`. Layout definitions live in `assets/js/layouts.js`, letting the portal hydrate widget slots dynamically per page/role.
+- **Role system:** The "Preview as role" picker lets you flip between personas (end user, managers, IT). Navigation, page layouts, and widgets respect per-role visibility rules defined in `layouts.js` and widget manifests.
+- **Admin console:** The admin shell demonstrates navigation, role preview, navigation manager, page list and layout editor, widget visibility matrix, DNS Manager configuration, and role-aware My Tickets presets. Custom widget manifests are loaded to show how bespoke components can be added.
+- **Themes:** Light/dark theme switching is handled in `assets/js/app.js` with CSS variable overrides in `assets/css/base.css`.
+
 ## For humans
 
 If you are a human developer or product person:

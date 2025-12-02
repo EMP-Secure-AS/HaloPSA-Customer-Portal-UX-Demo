@@ -8,7 +8,7 @@
   <link rel="stylesheet" href="../assets/css/base.css" />
 </head>
 <body class="admin-layout">
-  <aside class="admin-sidebar">
+  <aside id="admin-sidebar" class="admin-sidebar">
     <div class="admin-sidebar__brand">
       <span class="brand-mark">G</span>
       <span class="brand-name">Portal Admin</span>
@@ -23,6 +23,7 @@
       <button class="admin-nav-item" data-section="devtools">Developer Tools</button>
     </nav>
   </aside>
+  <div id="admin-backdrop" class="admin-backdrop" aria-hidden="true"></div>
 
   <div class="admin-main">
     <header class="admin-main__header">
@@ -32,6 +33,14 @@
         <p class="muted" style="margin: 0;">Configure navigation, pages, widgets, and roles for the portal experience.</p>
       </div>
       <div class="admin-main__actions">
+        <button
+          id="sidebar-toggle"
+          class="icon-button sidebar-toggle"
+          aria-controls="admin-sidebar"
+          aria-expanded="false"
+        >
+          Menu
+        </button>
         <select id="admin-role-select" class="role-select" aria-label="Preview portal as role"></select>
         <button id="admin-theme-toggle" data-role="theme-toggle" class="btn btn-secondary">Dark mode</button>
       </div>
