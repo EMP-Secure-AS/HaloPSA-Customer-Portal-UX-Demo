@@ -8,6 +8,8 @@
     { id: "group_it", label: "Group IT", description: "Group / regional IT leadership" }
   ];
 
+  var STORAGE_KEY = "halo-portal-layouts";
+
   var widgetLibrary = [
     { id: "hero-search", name: "Hero Search", description: "Search-focused hero with prompts" },
     { id: "quick-actions", name: "Quick Actions", description: "Common IT shortcuts" },
@@ -398,9 +400,58 @@
     }
   };
 
+  var layoutPresets = [
+    { id: "one", label: "1 column", columns: [12] },
+    { id: "two", label: "2 columns", columns: [6, 6] },
+    { id: "two-wide", label: "Sidebar", columns: [8, 4] },
+    { id: "three", label: "3 columns", columns: [4, 4, 4] },
+    { id: "four", label: "4 columns", columns: [3, 3, 3, 3] },
+  ];
+
   function clone(value) {
     return JSON.parse(JSON.stringify(value));
   }
+
+  function persistState() {
+    if (typeof window === "undefined" || !window.localStorage) return;
+    try {
+      var snapshot = {
+        pageLayouts: pageLayouts,
+        pages: pages,
+        navItems: navItems,
+        widgetVisibility: widgetVisibility,
+        widgetConfigs: widgetConfigs,
+        portalSettings: portalSettings,
+        ticketPresetByRole: ticketPresetByRole,
+      };
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(snapshot));
+    } catch (e) {
+      // Ignore storage issues
+    }
+  }
+
+  function hydrateFromState(state) {
+    if (!state) return;
+    if (state.pageLayouts) pageLayouts = state.pageLayouts;
+    if (state.pages) pages = state.pages;
+    if (state.navItems) navItems = state.navItems;
+    if (state.widgetVisibility) widgetVisibility = state.widgetVisibility;
+    if (state.widgetConfigs) widgetConfigs = state.widgetConfigs;
+    if (state.portalSettings) portalSettings = Object.assign({}, portalSettings, state.portalSettings);
+    if (state.ticketPresetByRole) ticketPresetByRole = state.ticketPresetByRole;
+  }
+
+  (function restore() {
+    if (typeof window === "undefined" || !window.localStorage) return;
+    try {
+      var raw = window.localStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        hydrateFromState(JSON.parse(raw));
+      }
+    } catch (e) {
+      // Ignore storage issues
+    }
+  })();
 
   function getPortalSettings() {
     return clone(portalSettings);
@@ -408,11 +459,13 @@
 
   function updatePortalSettings(updates) {
     portalSettings = Object.assign({}, portalSettings, updates || {});
+    persistState();
     return getPortalSettings();
   }
 
   function setBehaviourFlag(flag, value) {
     portalSettings.behaviourFlags[flag] = value;
+    persistState();
   }
 
   function getBehaviourFlags() {
@@ -421,6 +474,7 @@
 
   function setNavToggle(navId, enabled) {
     portalSettings.menuToggles[navId] = enabled;
+    persistState();
   }
 
   function getNavToggles() {
@@ -435,6 +489,7 @@
       url: "https://example.com",
       enabled: true,
     });
+    persistState();
     return getCustomButtons();
   }
 
@@ -442,6 +497,7 @@
     var target = portalSettings.customButtons.find(function (btn) { return btn.id === id; });
     if (!target) return getCustomButtons();
     Object.assign(target, updates || {});
+    persistState();
     return getCustomButtons();
   }
 
@@ -450,6 +506,7 @@
     if (idx > -1) {
       portalSettings.customButtons.splice(idx, 1);
     }
+    persistState();
     return getCustomButtons();
   }
 
@@ -525,6 +582,7 @@
     if (target < 0 || target >= navItems.length) return getNavItems();
     var item = navItems.splice(index, 1)[0];
     navItems.splice(target, 0, item);
+    persistState();
     return getNavItems();
   }
 
@@ -578,6 +636,7 @@
     };
     pages.push(page);
     pageLayouts[id] = pageConfig.layout || defaultLayout(id);
+    persistState();
     return page;
   }
 
@@ -610,10 +669,14 @@
       return r.id === rowId;
     });
     if (!row || !row.columns[columnIndex]) return;
-    row.columns[columnIndex].widgets.push(normalizeWidgetRef(widgetId));
+    var newWidget = normalizeWidgetRef(widgetId);
+    newWidget.title = "";
+    newWidget.dataScope = "All data";
+    row.columns[columnIndex].widgets.push(newWidget);
+    persistState();
   }
 
-  function removeWidgetFromPage(pageId, rowId, columnIndex, widgetId) {
+  function removeWidgetFromPage(pageId, rowId, columnIndex, widgetIndex) {
     var layout = pageLayouts[pageId];
     if (!layout) return;
     var row = layout.rows.find(function (r) {
@@ -621,10 +684,117 @@
     });
     if (!row || !row.columns[columnIndex]) return;
     var widgets = row.columns[columnIndex].widgets;
-    var idx = widgets.findIndex(function (w) { return w.id === widgetId; });
+    var idx = typeof widgetIndex === "number" ? widgetIndex : widgets.findIndex(function (w) { return w.id === widgetIndex; });
     if (idx > -1) {
       widgets.splice(idx, 1);
+      persistState();
     }
+  }
+
+  function moveRow(pageId, rowId, delta) {
+    var layout = pageLayouts[pageId];
+    if (!layout) return;
+    var idx = layout.rows.findIndex(function (row) { return row.id === rowId; });
+    if (idx < 0) return;
+    var target = idx + delta;
+    if (target < 0 || target >= layout.rows.length) return;
+    var row = layout.rows.splice(idx, 1)[0];
+    layout.rows.splice(target, 0, row);
+    persistState();
+  }
+
+  function addRowToPage(pageId, presetId) {
+    var layout = pageLayouts[pageId];
+    if (!layout) return null;
+    var preset = layoutPresets.find(function (p) { return p.id === presetId; }) || layoutPresets[0];
+    var nextIndex = layout.rows.length + 1;
+    var rowId = "row-" + preset.id + "-" + nextIndex + "-" + Date.now();
+    var newRow = {
+      id: rowId,
+      label: preset.label + " " + nextIndex,
+      columns: preset.columns.map(function (colWidth) {
+        return { width: colWidth, widgets: [] };
+      }),
+    };
+    layout.rows.push(newRow);
+    persistState();
+    return newRow;
+  }
+
+  function removeRowFromPage(pageId, rowId) {
+    var layout = pageLayouts[pageId];
+    if (!layout) return;
+    var idx = layout.rows.findIndex(function (row) { return row.id === rowId; });
+    if (idx > -1) {
+      layout.rows.splice(idx, 1);
+      persistState();
+    }
+  }
+
+  function moveWidget(pageId, rowId, columnIndex, widgetIndex, delta) {
+    var layout = pageLayouts[pageId];
+    if (!layout) return;
+    var row = layout.rows.find(function (r) { return r.id === rowId; });
+    if (!row) return;
+    var widgets = (row.columns[columnIndex] || {}).widgets;
+    if (!widgets || typeof widgetIndex !== "number") return;
+    var target = widgetIndex + delta;
+    if (target < 0 || target >= widgets.length) return;
+    var widget = widgets.splice(widgetIndex, 1)[0];
+    widgets.splice(target, 0, widget);
+    persistState();
+  }
+
+  function moveWidgetToColumn(pageId, rowId, fromColumnIndex, toColumnIndex, widgetIndex) {
+    var layout = pageLayouts[pageId];
+    if (!layout) return;
+    var row = layout.rows.find(function (r) { return r.id === rowId; });
+    if (!row) return;
+    var fromCol = row.columns[fromColumnIndex];
+    var toCol = row.columns[toColumnIndex];
+    if (!fromCol || !toCol || typeof widgetIndex !== "number") return;
+    var widget = fromCol.widgets.splice(widgetIndex, 1)[0];
+    if (widget) {
+      toCol.widgets.push(widget);
+      persistState();
+    }
+  }
+
+  function updateRowLabel(pageId, rowId, label) {
+    var layout = pageLayouts[pageId];
+    if (!layout) return;
+    var row = layout.rows.find(function (r) { return r.id === rowId; });
+    if (!row) return;
+    row.label = label;
+    persistState();
+  }
+
+  function changeRowLayout(pageId, rowId, presetId) {
+    var layout = pageLayouts[pageId];
+    if (!layout) return;
+    var row = layout.rows.find(function (r) { return r.id === rowId; });
+    if (!row) return;
+    var preset = layoutPresets.find(function (p) { return p.id === presetId; }) || layoutPresets[0];
+    var existingWidgets = row.columns.reduce(function (all, col) {
+      return all.concat(col.widgets || []);
+    }, []);
+    row.columns = preset.columns.map(function (width) { return { width: width, widgets: [] }; });
+    existingWidgets.forEach(function (widget, index) {
+      var targetIndex = index % row.columns.length;
+      row.columns[targetIndex].widgets.push(widget);
+    });
+    persistState();
+  }
+
+  function updateWidgetProperties(pageId, rowId, columnIndex, widgetIndex, updates) {
+    var layout = pageLayouts[pageId];
+    if (!layout) return;
+    var row = layout.rows.find(function (r) { return r.id === rowId; });
+    if (!row || !row.columns[columnIndex]) return;
+    var widget = row.columns[columnIndex].widgets[widgetIndex];
+    if (!widget) return;
+    Object.assign(widget, updates || {});
+    persistState();
   }
 
   function registerCustomWidgets(manifests) {
@@ -663,6 +833,7 @@
 
   function setWidgetVisibility(widgetId, roleIds) {
     widgetVisibility[widgetId] = roleIds.slice();
+    persistState();
   }
 
   function getWidgetVisibility() {
@@ -676,6 +847,7 @@
   function updateWidgetConfig(widgetId, updates) {
     var current = widgetConfigs[widgetId] || {};
     widgetConfigs[widgetId] = Object.assign({}, current, updates);
+    persistState();
   }
 
   function getTicketPresetForRole(role) {
@@ -685,6 +857,7 @@
   function setTicketPresetForRole(role, presetId) {
     if (ticketPresets[presetId]) {
       ticketPresetByRole[role] = presetId;
+      persistState();
     }
   }
 
@@ -748,6 +921,15 @@
     getLayoutForRole: getLayoutForRole,
     addWidgetToPage: addWidgetToPage,
     removeWidgetFromPage: removeWidgetFromPage,
+    moveRow: moveRow,
+    addRowToPage: addRowToPage,
+    removeRowFromPage: removeRowFromPage,
+    moveWidget: moveWidget,
+    moveWidgetToColumn: moveWidgetToColumn,
+    updateRowLabel: updateRowLabel,
+    changeRowLayout: changeRowLayout,
+    updateWidgetProperties: updateWidgetProperties,
+    getLayoutPresets: function () { return clone(layoutPresets); },
     getWidgetLibrary: getWidgetLibrary,
     registerCustomWidgets: registerCustomWidgets,
     getRoles: getRoles,

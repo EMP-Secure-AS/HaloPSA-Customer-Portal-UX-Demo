@@ -5,6 +5,8 @@
   var layoutPageSelect;
   var layoutSummaryEl;
   var layoutCanvasEl;
+  var layoutToolbarEl;
+  var layoutInspectorEl;
   var widgetVisibilityEl;
   var ticketOverridesEl;
   var roleCatalogEl;
@@ -23,6 +25,8 @@
   var customNavPanelEl;
   var widgetLibrary = [];
   var selectedPageId = null;
+  var selectedWidgetContext = null;
+  var selectedRowId = null;
   var roles = [];
 
   function getPreviewRole() {
@@ -169,44 +173,127 @@
     var desc = document.createElement("p");
     desc.className = "muted";
     desc.style.margin = "0";
-    desc.textContent = "Add or remove widgets to simulate a drag-and-drop builder.";
+    desc.textContent = "Add rows, choose a column layout, reorder, and configure widgets. Changes auto-save to your browser.";
     layoutSummaryEl.appendChild(desc);
   }
 
-  function renderWidgetChip(widget, pageId, rowId, colIndex) {
+  function renderWidgetChip(widget, pageId, rowId, colIndex, widgetIndex, columnCount) {
     var chip = document.createElement("div");
     chip.className = "widget-chip";
+    var isSelected =
+      selectedWidgetContext &&
+      selectedWidgetContext.pageId === pageId &&
+      selectedWidgetContext.rowId === rowId &&
+      selectedWidgetContext.colIndex === colIndex &&
+      selectedWidgetContext.widgetIndex === widgetIndex;
+    if (isSelected) chip.classList.add("widget-chip--selected");
+
     var name = widgetLibrary.find(function (w) {
       return w.id === widget.id;
     });
     var label = name ? name.name : widget.id;
+    if (widget.title) {
+      label = widget.title + " • " + label;
+    }
     if (widget.variant) {
       label += " • " + widget.variant;
     }
-    chip.textContent = label;
+    var labelEl = document.createElement("div");
+    labelEl.textContent = label;
+    chip.appendChild(labelEl);
     var rolesLabel = document.createElement("span");
     rolesLabel.className = "pill pill--ghost";
     var roleCount = (widget.visibleForRoles || []).length;
     rolesLabel.textContent = roleCount === roles.length ? "All roles" : roleCount + " role(s)";
     chip.appendChild(rolesLabel);
 
+    var controls = document.createElement("div");
+    controls.className = "inline";
+    controls.style.gap = "0.35rem";
+    controls.style.marginLeft = "auto";
+
+    var up = createIconButton("Move up", "up");
+    up.addEventListener("click", function (event) {
+      event.stopPropagation();
+      window.LayoutLibrary.moveWidget(pageId, rowId, colIndex, widgetIndex, -1);
+      renderLayoutEditor();
+    });
+    up.disabled = widgetIndex === 0;
+
+    var down = createIconButton("Move down", "down");
+    down.addEventListener("click", function (event) {
+      event.stopPropagation();
+      window.LayoutLibrary.moveWidget(pageId, rowId, colIndex, widgetIndex, 1);
+      renderLayoutEditor();
+    });
+    var layoutSnapshot = window.LayoutLibrary.getPageLayout(pageId) || { rows: [] };
+    var targetRow = (layoutSnapshot.rows || []).find(function (r) { return r.id === rowId; });
+    var targetCol = targetRow && targetRow.columns ? targetRow.columns[colIndex] : null;
+    var totalWidgets = targetCol && targetCol.widgets ? targetCol.widgets.length : 0;
+    down.disabled = widgetIndex >= totalWidgets - 1;
+
+    var left = createIconButton("Move left", "up");
+    left.textContent = "←";
+    left.addEventListener("click", function (event) {
+      event.stopPropagation();
+      if (colIndex > 0) {
+        window.LayoutLibrary.moveWidgetToColumn(pageId, rowId, colIndex, colIndex - 1, widgetIndex);
+        renderLayoutEditor();
+      }
+    });
+    left.disabled = colIndex === 0;
+
+    var right = createIconButton("Move right", "down");
+    right.textContent = "→";
+    right.addEventListener("click", function (event) {
+      event.stopPropagation();
+      if (colIndex < columnCount - 1) {
+        window.LayoutLibrary.moveWidgetToColumn(pageId, rowId, colIndex, colIndex + 1, widgetIndex);
+        renderLayoutEditor();
+      }
+    });
+    right.disabled = colIndex >= columnCount - 1;
+
     var remove = document.createElement("button");
     remove.className = "btn btn-ghost btn-icon";
     remove.textContent = "✕";
     remove.setAttribute("aria-label", "Remove widget");
-    remove.addEventListener("click", function () {
-      window.LayoutLibrary.removeWidgetFromPage(pageId, rowId, colIndex, widget.id);
+    remove.addEventListener("click", function (event) {
+      event.stopPropagation();
+      window.LayoutLibrary.removeWidgetFromPage(pageId, rowId, colIndex, widgetIndex);
+      selectedWidgetContext = null;
       renderLayoutEditor();
     });
-    chip.appendChild(remove);
+
+    [left, right, up, down, remove].forEach(function (btn) { controls.appendChild(btn); });
+    chip.appendChild(controls);
+
+    chip.addEventListener("click", function () {
+      selectedWidgetContext = {
+        pageId: pageId,
+        rowId: rowId,
+        colIndex: colIndex,
+        widgetIndex: widgetIndex,
+      };
+      renderLayoutEditor();
+    });
     return chip;
   }
 
   function renderColumnControls(pageId, row, columnIndex) {
     var control = document.createElement("div");
-    control.className = "inline";
+    control.className = "stack layout-col__controls";
     control.style.marginTop = "0.5rem";
-    control.style.gap = "0.5rem";
+    control.style.gap = "0.35rem";
+
+    var helper = document.createElement("div");
+    helper.className = "helper-text";
+    helper.textContent = "Add a widget to this column";
+    control.appendChild(helper);
+
+    var line = document.createElement("div");
+    line.className = "inline";
+    line.style.gap = "0.5rem";
 
     var select = document.createElement("select");
     widgetLibrary.forEach(function (widget) {
@@ -224,21 +311,105 @@
       renderLayoutEditor();
     });
 
-    control.appendChild(select);
-    control.appendChild(addBtn);
+    line.appendChild(select);
+    line.appendChild(addBtn);
+    control.appendChild(line);
     return control;
+  }
+
+  function renderRowHeader(pageId, row, rowIndex, totalRows) {
+    var header = document.createElement("div");
+    header.className = "layout-row__header";
+
+    var labelField = document.createElement("input");
+    labelField.type = "text";
+    labelField.className = "text-input";
+    labelField.value = row.label || "Row";
+    labelField.addEventListener("input", function () {
+      window.LayoutLibrary.updateRowLabel(pageId, row.id, labelField.value);
+    });
+
+    var presetSelect = document.createElement("select");
+    var presets = window.LayoutLibrary.getLayoutPresets();
+    var currentPreset = presets.find(function (preset) {
+      return preset.columns.join("-") === row.columns.map(function (c) { return c.width; }).join("-");
+    });
+    presets.forEach(function (preset) {
+      var opt = document.createElement("option");
+      opt.value = preset.id;
+      opt.textContent = preset.label + " (" + preset.columns.join("/") + ")";
+      if (currentPreset && currentPreset.id === preset.id) opt.selected = true;
+      presetSelect.appendChild(opt);
+    });
+    presetSelect.addEventListener("change", function (event) {
+      window.LayoutLibrary.changeRowLayout(pageId, row.id, event.target.value);
+      renderLayoutEditor();
+    });
+
+    var actions = document.createElement("div");
+    actions.className = "inline";
+    actions.style.gap = "0.35rem";
+
+    var up = createIconButton("Move row up", "up");
+    up.disabled = rowIndex === 0;
+    up.addEventListener("click", function () {
+      window.LayoutLibrary.moveRow(pageId, row.id, -1);
+      renderLayoutEditor();
+    });
+
+    var down = createIconButton("Move row down", "down");
+    down.disabled = rowIndex === totalRows - 1;
+    down.addEventListener("click", function () {
+      window.LayoutLibrary.moveRow(pageId, row.id, 1);
+      renderLayoutEditor();
+    });
+
+    var remove = document.createElement("button");
+    remove.className = "btn btn-ghost btn-icon";
+    remove.textContent = "✕";
+    remove.setAttribute("aria-label", "Remove row");
+    remove.addEventListener("click", function () {
+      window.LayoutLibrary.removeRowFromPage(pageId, row.id);
+      if (selectedRowId === row.id) selectedRowId = null;
+      renderLayoutEditor();
+    });
+
+    actions.appendChild(up);
+    actions.appendChild(down);
+    actions.appendChild(remove);
+
+    var left = document.createElement("div");
+    left.className = "stack";
+    left.style.gap = "0.25rem";
+    left.appendChild(labelField);
+    var presetWrap = document.createElement("div");
+    presetWrap.className = "inline";
+    presetWrap.style.gap = "0.35rem";
+    var presetLabel = document.createElement("span");
+    presetLabel.className = "helper-text";
+    presetLabel.textContent = "Layout";
+    presetWrap.appendChild(presetLabel);
+    presetWrap.appendChild(presetSelect);
+    left.appendChild(presetWrap);
+
+    header.appendChild(left);
+    header.appendChild(actions);
+    header.addEventListener("click", function () {
+      selectedRowId = row.id;
+      renderLayoutEditor();
+    });
+    return header;
   }
 
   function renderLayoutCanvas(pageId, layout) {
     layoutCanvasEl.innerHTML = "";
-    layout.rows.forEach(function (row) {
+    var previewRole = getPreviewRole();
+    layout.rows.forEach(function (row, rowIndex) {
       var rowEl = document.createElement("div");
       rowEl.className = "layout-row";
+      if (selectedRowId === row.id) rowEl.classList.add("layout-row--selected");
 
-      var rowLabel = document.createElement("div");
-      rowLabel.className = "layout-row__label";
-      rowLabel.textContent = row.label;
-      rowEl.appendChild(rowLabel);
+      rowEl.appendChild(renderRowHeader(pageId, row, rowIndex, layout.rows.length));
 
       var columnsEl = document.createElement("div");
       columnsEl.className = "layout-row__columns";
@@ -256,12 +427,20 @@
         body.className = "layout-col__body";
         if (!col.widgets.length) {
           var empty = document.createElement("div");
-          empty.className = "muted small-text";
-          empty.textContent = "No widgets";
+          empty.className = "muted small-text layout-col__empty";
+          empty.textContent = "Drop widgets here";
           body.appendChild(empty);
         } else {
-          col.widgets.forEach(function (widget) {
-            body.appendChild(renderWidgetChip(widget, pageId, row.id, colIndex));
+          col.widgets.forEach(function (widget, widgetIndex) {
+            var chip = renderWidgetChip(widget, pageId, row.id, colIndex, widgetIndex, row.columns.length);
+            if ((widget.visibleForRoles || []).indexOf(previewRole) === -1) {
+              chip.classList.add("widget-chip--muted");
+              var hidden = document.createElement("span");
+              hidden.className = "pill pill--ghost";
+              hidden.textContent = "Hidden for " + previewRole.replace("_", " ");
+              chip.appendChild(hidden);
+            }
+            body.appendChild(chip);
           });
         }
         colEl.appendChild(body);
@@ -273,6 +452,231 @@
       rowEl.appendChild(columnsEl);
       layoutCanvasEl.appendChild(rowEl);
     });
+  }
+
+  function renderLayoutToolbar(pageId, layout) {
+    if (!layoutToolbarEl) return;
+    var presets = window.LayoutLibrary.getLayoutPresets();
+    layoutToolbarEl.innerHTML = "";
+
+    var heading = document.createElement("div");
+    heading.className = "inline";
+    heading.style.justifyContent = "space-between";
+    heading.innerHTML = '<div class="stack" style="gap: 4px;"><h4 style="margin: 0;">Row layouts</h4><p class="muted" style="margin: 0;">Pick a preset and add a new row.</p></div>';
+    layoutToolbarEl.appendChild(heading);
+
+    var palette = document.createElement("div");
+    palette.className = "layout-palette";
+    presets.forEach(function (preset) {
+      var btn = document.createElement("button");
+      btn.className = "layout-preset";
+      btn.setAttribute("aria-label", "Add " + preset.label);
+      var label = document.createElement("div");
+      label.className = "layout-preset__label";
+      label.textContent = preset.label;
+      var preview = document.createElement("div");
+      preview.className = "layout-preset__preview";
+      preset.columns.forEach(function (width) {
+        var block = document.createElement("span");
+        block.style.flexBasis = (width / 12) * 100 + "%";
+        block.textContent = width;
+        preview.appendChild(block);
+      });
+      btn.appendChild(label);
+      btn.appendChild(preview);
+      btn.addEventListener("click", function () {
+        window.LayoutLibrary.addRowToPage(pageId, preset.id);
+        renderLayoutEditor();
+      });
+      palette.appendChild(btn);
+    });
+    layoutToolbarEl.appendChild(palette);
+
+    var persistNote = document.createElement("div");
+    persistNote.className = "helper-text";
+    persistNote.textContent = "Layouts are stored in localStorage for this demo. Clearing browser data will reset to defaults.";
+    layoutToolbarEl.appendChild(persistNote);
+  }
+
+  function renderWidgetInspector(pageId, layout) {
+    if (!layoutInspectorEl) return;
+    layoutInspectorEl.innerHTML = "";
+    var intro = document.createElement("div");
+    intro.className = "stack";
+    intro.style.gap = "0.35rem";
+    var heading = document.createElement("h4");
+    heading.textContent = "Widget properties";
+    heading.style.margin = "0";
+    var helper = document.createElement("p");
+    helper.className = "muted";
+    helper.style.margin = "0";
+    helper.textContent = "Select a widget chip to edit its title, variant, data scope, and visibility.";
+    intro.appendChild(heading);
+    intro.appendChild(helper);
+    layoutInspectorEl.appendChild(intro);
+
+    if (!selectedWidgetContext || selectedWidgetContext.pageId !== pageId) {
+      var placeholder = document.createElement("div");
+      placeholder.className = "helper-text";
+      placeholder.textContent = "Choose a widget from the canvas to configure it.";
+      layoutInspectorEl.appendChild(placeholder);
+      return;
+    }
+
+    var row = (layout.rows || []).find(function (r) { return r.id === selectedWidgetContext.rowId; });
+    var column = row ? row.columns[selectedWidgetContext.colIndex] : null;
+    var widget = column ? column.widgets[selectedWidgetContext.widgetIndex] : null;
+    if (!widget) {
+      var missing = document.createElement("div");
+      missing.className = "helper-text";
+      missing.textContent = "Selected widget no longer exists in this layout.";
+      layoutInspectorEl.appendChild(missing);
+      return;
+    }
+
+    var name = widgetLibrary.find(function (w) { return w.id === widget.id; }) || { name: widget.id };
+    var title = document.createElement("div");
+    title.className = "stack";
+    title.style.gap = "0.25rem";
+    var headingText = document.createElement("div");
+    headingText.className = "list-row__title";
+    headingText.textContent = name.name;
+    var sub = document.createElement("div");
+    sub.className = "helper-text";
+    sub.textContent = "Instance-level overrides";
+    title.appendChild(headingText);
+    title.appendChild(sub);
+    layoutInspectorEl.appendChild(title);
+
+    function createField(labelText, value, onChange, placeholder) {
+      var wrapper = document.createElement("label");
+      wrapper.className = "stack";
+      wrapper.style.gap = "0.25rem";
+      var label = document.createElement("span");
+      label.className = "list-row__title";
+      label.textContent = labelText;
+      var input = document.createElement("input");
+      input.type = "text";
+      input.className = "text-input";
+      input.value = value || "";
+      if (placeholder) input.placeholder = placeholder;
+      input.addEventListener("input", function (event) {
+        onChange(event.target.value);
+      });
+      wrapper.appendChild(label);
+      wrapper.appendChild(input);
+      return wrapper;
+    }
+
+    layoutInspectorEl.appendChild(
+      createField("Display title", widget.title || "", function (val) {
+        window.LayoutLibrary.updateWidgetProperties(pageId, row.id, selectedWidgetContext.colIndex, selectedWidgetContext.widgetIndex, {
+          title: val,
+        });
+      }, "Optional heading override")
+    );
+
+    var variantField = document.createElement("label");
+    variantField.className = "stack";
+    variantField.style.gap = "0.25rem";
+    var variantLabel = document.createElement("span");
+    variantLabel.className = "list-row__title";
+    variantLabel.textContent = "Variant";
+    var variantSelect = document.createElement("select");
+    var variants = [
+      { value: "", label: "Default" },
+      { value: "summary", label: "Summary" },
+      { value: "operations", label: "Operations" },
+      { value: "compact", label: "Compact" },
+      { value: "wide", label: "Wide" },
+    ];
+    variants.forEach(function (v) {
+      var opt = document.createElement("option");
+      opt.value = v.value;
+      opt.textContent = v.label;
+      if (v.value === (widget.variant || "")) opt.selected = true;
+      variantSelect.appendChild(opt);
+    });
+    variantSelect.addEventListener("change", function (event) {
+      window.LayoutLibrary.updateWidgetProperties(pageId, row.id, selectedWidgetContext.colIndex, selectedWidgetContext.widgetIndex, {
+        variant: event.target.value || undefined,
+      });
+      renderLayoutEditor();
+    });
+    variantField.appendChild(variantLabel);
+    variantField.appendChild(variantSelect);
+    layoutInspectorEl.appendChild(variantField);
+
+    layoutInspectorEl.appendChild(
+      createField("Data scope", widget.dataScope || "All data", function (val) {
+        window.LayoutLibrary.updateWidgetProperties(pageId, row.id, selectedWidgetContext.colIndex, selectedWidgetContext.widgetIndex, {
+          dataScope: val,
+        });
+      }, "All data / My department / Region")
+    );
+
+    var roleWrap = document.createElement("div");
+    roleWrap.className = "stack";
+    roleWrap.style.gap = "0.25rem";
+    var roleTitle = document.createElement("div");
+    roleTitle.className = "list-row__title";
+    roleTitle.textContent = "Role visibility";
+    var roleHelper = document.createElement("div");
+    roleHelper.className = "helper-text";
+    roleHelper.textContent = "Overrides the global widget visibility for this instance.";
+    var roleList = document.createElement("div");
+    roleList.className = "inline";
+    roleList.style.flexWrap = "wrap";
+    roleList.style.gap = "0.5rem";
+    var currentRoles = widget.visibleForRoles || roles.map(function (r) { return r.id; });
+    roles.forEach(function (role) {
+      var label = document.createElement("label");
+      label.className = "checkbox";
+      var input = document.createElement("input");
+      input.type = "checkbox";
+      input.value = role.id;
+      input.checked = currentRoles.indexOf(role.id) > -1;
+      input.addEventListener("change", function () {
+        var updatedRoles = new Set(currentRoles);
+        if (input.checked) {
+          updatedRoles.add(role.id);
+        } else {
+          updatedRoles.delete(role.id);
+        }
+        currentRoles = Array.from(updatedRoles);
+        window.LayoutLibrary.updateWidgetProperties(pageId, row.id, selectedWidgetContext.colIndex, selectedWidgetContext.widgetIndex, {
+          visibleForRoles: currentRoles,
+        });
+        renderLayoutEditor();
+      });
+      var text = document.createElement("span");
+      text.textContent = role.label;
+      label.appendChild(input);
+      label.appendChild(text);
+      roleList.appendChild(label);
+    });
+    roleWrap.appendChild(roleTitle);
+    roleWrap.appendChild(roleHelper);
+    roleWrap.appendChild(roleList);
+    layoutInspectorEl.appendChild(roleWrap);
+
+    var actions = document.createElement("div");
+    actions.className = "inline";
+    actions.style.justifyContent = "space-between";
+    var meta = document.createElement("span");
+    meta.className = "helper-text";
+    meta.textContent = "Col " + (selectedWidgetContext.colIndex + 1) + " • " + (widget.variant || "default");
+    var remove = document.createElement("button");
+    remove.className = "btn btn-secondary";
+    remove.textContent = "Remove widget";
+    remove.addEventListener("click", function () {
+      window.LayoutLibrary.removeWidgetFromPage(pageId, row.id, selectedWidgetContext.colIndex, selectedWidgetContext.widgetIndex);
+      selectedWidgetContext = null;
+      renderLayoutEditor();
+    });
+    actions.appendChild(meta);
+    actions.appendChild(remove);
+    layoutInspectorEl.appendChild(actions);
   }
 
   function renderLayoutEditor() {
@@ -295,10 +699,18 @@
       return p.id === selectedPageId;
     }) || pages[0];
     selectedPageId = activePage.id;
-    var layout = window.LayoutLibrary.getLayoutForRole(activePage.id, getPreviewRole());
+    var layout = window.LayoutLibrary.getPageLayout(activePage.id);
+    if (selectedWidgetContext && selectedWidgetContext.pageId !== activePage.id) {
+      selectedWidgetContext = null;
+    }
+    if (!layout.rows.find(function (r) { return r.id === selectedRowId; })) {
+      selectedRowId = null;
+    }
 
     renderLayoutSummary(activePage, layout);
+    renderLayoutToolbar(activePage.id, layout);
     renderLayoutCanvas(activePage.id, layout);
+    renderWidgetInspector(activePage.id, layout);
   }
 
   function wireAddPage() {
@@ -567,6 +979,8 @@
     layoutPageSelect = document.getElementById("layout-page-select");
     layoutSummaryEl = document.getElementById("layout-summary");
     layoutCanvasEl = document.getElementById("layout-canvas");
+    layoutToolbarEl = document.getElementById("layout-toolbar");
+    layoutInspectorEl = document.getElementById("layout-inspector");
     widgetVisibilityEl = document.getElementById("widget-visibility-table");
     ticketOverridesEl = document.getElementById("ticket-role-overrides");
     roleCatalogEl = document.getElementById("role-catalog");

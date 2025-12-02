@@ -16,6 +16,7 @@
   --color-sidebar-text: #e5e7eb;
   --color-sidebar-muted: rgba(148, 163, 184, 0.8);
   --color-primary: #1363df;
+  --color-primary-transparent: rgba(19, 99, 223, 0.2);
   --color-accent: #12c4ad;
   --color-warn: #f97316;
 
@@ -807,8 +808,21 @@ img {
   gap: var(--space-6);
 }
 
+.layout-row--selected {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px var(--color-primary-transparent), var(--shadow-light);
+}
+
 .layout-row__label {
   font-weight: 700;
+}
+
+.layout-row__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-6);
+  flex-wrap: wrap;
 }
 
 .layout-row__columns {
@@ -828,6 +842,11 @@ img {
   flex-grow: 1;
 }
 
+.layout-col__controls {
+  border-top: 1px dashed var(--color-border-subtle);
+  padding-top: var(--space-4);
+}
+
 .layout-col__header {
   font-weight: 600;
   font-size: var(--text-sm);
@@ -837,6 +856,10 @@ img {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-6);
+}
+
+.layout-col__empty {
+  padding: var(--space-4) 0;
 }
 
 .widget-chip {
@@ -849,6 +872,65 @@ img {
   border: 1px solid var(--color-border-subtle);
   box-shadow: var(--shadow-light);
   font-weight: 600;
+}
+
+.widget-chip--selected {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px var(--color-primary-transparent), var(--shadow-light);
+}
+
+.widget-chip--muted {
+  opacity: 0.75;
+}
+
+.layout-editor-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: var(--space-8);
+  align-items: start;
+}
+
+.layout-palette {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+}
+
+.layout-preset {
+  border: 1px solid var(--color-border-subtle);
+  background: var(--color-surface-muted);
+  padding: var(--space-4) var(--space-6);
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  cursor: pointer;
+}
+
+.layout-preset__label {
+  font-weight: 600;
+  font-size: var(--text-sm);
+}
+
+.layout-preset__preview {
+  display: flex;
+  gap: 4px;
+}
+
+.layout-preset__preview span {
+  background: var(--color-surface);
+  border: 1px dashed var(--color-border-subtle);
+  padding: 6px;
+  text-align: center;
+  border-radius: 8px;
+  font-size: var(--text-xs);
+  flex-grow: 1;
+}
+
+@media (max-width: 1024px) {
+  .layout-editor-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .dns-manager {

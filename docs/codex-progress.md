@@ -175,10 +175,16 @@ Notes:
 
 ## Phase 10 – Advanced Page/Block Editor
 
-- [ ] 10.1 Row add/remove with selectable column layouts
-- [ ] 10.2 Row/widget reordering
-- [ ] 10.3 Widget property panel for configuration
-- [ ] 10.4 Layout changes persist to shared model
-- [ ] 10.5 Optional localStorage persistence for layouts
-- [ ] 10.6 Enhanced editor affordances and placeholders
-- [ ] 10.7 Docs/progress updated for Phase 10 tasks
+- [x] 10.1 Row add/remove with selectable column layouts
+- [x] 10.2 Row/widget reordering
+- [x] 10.3 Widget property panel for configuration
+- [x] 10.4 Layout changes persist to shared model
+- [x] 10.5 Optional localStorage persistence for layouts
+- [x] 10.6 Enhanced editor affordances and placeholders
+- [x] 10.7 Docs/progress updated for Phase 10 tasks
+
+Notes:
+
+- Upgraded the layout editor into a block-style builder with preset row layouts (1–4 columns), row headers with rename/relayout controls, reordering, and removal actions plus column placeholders.
+- Added widget-level controls (move, remove, inspect) with a new inspector panel for title/variant/data scope and per-instance role visibility; chips highlight hidden widgets for the preview role.
+- Layout mutations now persist through the shared LayoutLibrary model and sync to localStorage alongside widget configs, nav order, and presets so admin edits survive reloads.
