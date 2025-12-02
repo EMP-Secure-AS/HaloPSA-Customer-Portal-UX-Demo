@@ -9,6 +9,18 @@
   var ticketOverridesEl;
   var roleCatalogEl;
   var dnsConfigEl;
+  var portalTitleInput;
+  var portalHeadlineInput;
+  var portalMessageInput;
+  var portalBannerInput;
+  var logoTextInput;
+  var logoUrlInput;
+  var primaryColorInput;
+  var accentColorInput;
+  var headerColorInput;
+  var authSettingsEl;
+  var navTogglePanelEl;
+  var customNavPanelEl;
   var widgetLibrary = [];
   var selectedPageId = null;
   var roles = [];
@@ -559,6 +571,320 @@
     ticketOverridesEl = document.getElementById("ticket-role-overrides");
     roleCatalogEl = document.getElementById("role-catalog");
     dnsConfigEl = document.getElementById("dns-config");
+    portalTitleInput = document.getElementById("portal-title-input");
+    portalHeadlineInput = document.getElementById("portal-headline-input");
+    portalMessageInput = document.getElementById("portal-message-input");
+    portalBannerInput = document.getElementById("portal-banner-input");
+    logoTextInput = document.getElementById("logo-text-input");
+    logoUrlInput = document.getElementById("logo-url-input");
+    primaryColorInput = document.getElementById("primary-color-input");
+    accentColorInput = document.getElementById("accent-color-input");
+    headerColorInput = document.getElementById("header-color-input");
+    authSettingsEl = document.getElementById("auth-settings");
+    navTogglePanelEl = document.getElementById("nav-toggle-panel");
+    customNavPanelEl = document.getElementById("custom-nav-panel");
+  }
+
+  function updatePortalSettings(partial) {
+    window.LayoutLibrary.updatePortalSettings(partial);
+    if (window.AppState && window.AppState.applyBranding) {
+      window.AppState.applyBranding();
+    }
+  }
+
+  function attachInputHandler(input, getValue, mapper) {
+    if (!input || input.dataset.bound) return;
+    input.addEventListener("input", function () {
+      var value = getValue();
+      mapper(value);
+    });
+    input.dataset.bound = "true";
+  }
+
+  function renderPortalBasics() {
+    if (!portalTitleInput) return;
+    var settings = window.LayoutLibrary.getPortalSettings();
+    portalTitleInput.value = settings.portalTitle || "";
+    portalHeadlineInput.value = settings.welcomeHeadline || "";
+    portalMessageInput.value = settings.welcomeMessage || "";
+    portalBannerInput.value = settings.bannerText || "";
+
+    attachInputHandler(portalTitleInput, function () { return portalTitleInput.value; }, function (val) {
+      updatePortalSettings({ portalTitle: val });
+    });
+    attachInputHandler(portalHeadlineInput, function () { return portalHeadlineInput.value; }, function (val) {
+      updatePortalSettings({ welcomeHeadline: val });
+    });
+    attachInputHandler(portalMessageInput, function () { return portalMessageInput.value; }, function (val) {
+      updatePortalSettings({ welcomeMessage: val });
+    });
+    attachInputHandler(portalBannerInput, function () { return portalBannerInput.value; }, function (val) {
+      updatePortalSettings({ bannerText: val });
+    });
+  }
+
+  function renderBrandingForm() {
+    if (!logoTextInput) return;
+    var settings = window.LayoutLibrary.getPortalSettings();
+    logoTextInput.value = settings.logoText || "";
+    logoUrlInput.value = settings.logoUrl || "";
+    primaryColorInput.value = settings.primaryColor || "#1363df";
+    accentColorInput.value = settings.accentColor || "#12c4ad";
+    headerColorInput.value = settings.headerColor || "#0b1f3b";
+
+    attachInputHandler(logoTextInput, function () { return logoTextInput.value; }, function (val) {
+      updatePortalSettings({ logoText: val });
+    });
+    attachInputHandler(logoUrlInput, function () { return logoUrlInput.value; }, function (val) {
+      updatePortalSettings({ logoUrl: val });
+    });
+    attachInputHandler(primaryColorInput, function () { return primaryColorInput.value; }, function (val) {
+      updatePortalSettings({ primaryColor: val });
+    });
+    attachInputHandler(accentColorInput, function () { return accentColorInput.value; }, function (val) {
+      updatePortalSettings({ accentColor: val });
+    });
+    attachInputHandler(headerColorInput, function () { return headerColorInput.value; }, function (val) {
+      updatePortalSettings({ headerColor: val });
+    });
+  }
+
+  function createToggleRow(labelText, flag, helperText, options) {
+    var row = document.createElement("label");
+    row.className = "list-row";
+    var main = document.createElement("div");
+    main.className = "list-row__main";
+    var title = document.createElement("div");
+    title.className = "list-row__title";
+    title.textContent = labelText;
+    var helper = document.createElement("div");
+    helper.className = "helper-text";
+    helper.textContent = helperText;
+    main.appendChild(title);
+    main.appendChild(helper);
+
+    var actions = document.createElement("div");
+    actions.className = "list-row__actions";
+    var input = document.createElement("input");
+    input.type = "checkbox";
+    input.checked = !!flag.value;
+    input.addEventListener("change", function () {
+      flag.onChange(input.checked);
+    });
+    if (options && options.disabled) {
+      input.disabled = true;
+    }
+    actions.appendChild(input);
+
+    row.appendChild(main);
+    row.appendChild(actions);
+    return row;
+  }
+
+  function renderAuthSettings() {
+    if (!authSettingsEl) return;
+    var flags = window.LayoutLibrary.getBehaviourFlags();
+    authSettingsEl.innerHTML = "";
+
+    var authRows = [
+      {
+        label: "Allow portal login",
+        key: "allowLogin",
+        helper: "Controls whether the self-service portal accepts logins.",
+        documentedOnly: true,
+      },
+      {
+        label: "Anonymous browsing",
+        key: "allowAnonymous",
+        helper: "Allow public/guest visibility for knowledge or request pages.",
+        documentedOnly: true,
+      },
+      {
+        label: "Allow incident submission",
+        key: "allowTicketSubmission",
+        helper: "If disabled, the Report Issue menu item and widget are hidden.",
+      },
+      {
+        label: "Allow service requests",
+        key: "allowServiceRequests",
+        helper: "Gates the Send Request page and catalog widget.",
+      },
+      {
+        label: "Allow knowledge base",
+        key: "allowKnowledge",
+        helper: "Hides knowledge pages and widgets when off.",
+      },
+      {
+        label: "Allow dashboards",
+        key: "allowDashboards",
+        helper: "Controls dashboard nav visibility for eligible roles.",
+      },
+      {
+        label: "Show legacy / feedback",
+        key: "showLegacy",
+        helper: "Toggle the legacy tickets page and widget.",
+      },
+      {
+        label: "Show ticket details page",
+        key: "showTicketDetails",
+        helper: "Hide the ticket drilldown navigation when toggled off.",
+      },
+    ];
+
+    authRows.forEach(function (row) {
+      var toggle = createToggleRow(
+        row.label,
+        {
+          value: flags[row.key],
+          onChange: function (val) {
+            window.LayoutLibrary.setBehaviourFlag(row.key, val);
+            renderNavManager();
+            renderPageList();
+            renderLayoutEditor();
+            renderNavToggles();
+          },
+        },
+        row.helper,
+        { disabled: !!row.documentedOnly }
+      );
+      authSettingsEl.appendChild(toggle);
+    });
+  }
+
+  function isPageFeatureDisabled(pageId) {
+    var flags = window.LayoutLibrary.getBehaviourFlags();
+    if (pageId === "report-issue") return !flags.allowTicketSubmission;
+    if (pageId === "service-catalog") return !flags.allowServiceRequests;
+    if (pageId === "knowledge") return !flags.allowKnowledge;
+    if (pageId === "dashboards") return !flags.allowDashboards;
+    if (pageId === "legacy") return !flags.showLegacy;
+    if (pageId === "ticket-details") return !flags.showTicketDetails;
+    return false;
+  }
+
+  function renderNavToggles() {
+    if (!navTogglePanelEl) return;
+    var navCatalog = window.LayoutLibrary.getNavCatalog();
+    var toggles = window.LayoutLibrary.getNavToggles();
+    navTogglePanelEl.innerHTML = "";
+
+    navCatalog.forEach(function (item) {
+      var row = document.createElement("div");
+      row.className = "list-row";
+      var main = document.createElement("div");
+      main.className = "list-row__main";
+      var title = document.createElement("div");
+      title.className = "list-row__title";
+      title.textContent = item.label;
+      var meta = document.createElement("div");
+      meta.className = "list-row__meta";
+      meta.textContent = item.route;
+      main.appendChild(title);
+      main.appendChild(meta);
+      if (isPageFeatureDisabled(item.pageId)) {
+        var helper = document.createElement("div");
+        helper.className = "helper-text";
+        helper.textContent = "Hidden because related behaviour is disabled.";
+        main.appendChild(helper);
+      }
+
+      var actions = document.createElement("div");
+      actions.className = "list-row__actions";
+      var checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.checked = toggles[item.id] !== false;
+      if (isPageFeatureDisabled(item.pageId)) {
+        checkbox.disabled = true;
+      }
+      checkbox.addEventListener("change", function () {
+        window.LayoutLibrary.setNavToggle(item.id, checkbox.checked);
+        renderNavManager();
+      });
+      actions.appendChild(checkbox);
+      row.appendChild(main);
+      row.appendChild(actions);
+      navTogglePanelEl.appendChild(row);
+    });
+  }
+
+  function renderCustomButtonsPanel() {
+    if (!customNavPanelEl) return;
+    var buttons = window.LayoutLibrary.getCustomButtons();
+    customNavPanelEl.innerHTML = "";
+
+    var header = document.createElement("div");
+    header.className = "inline";
+    header.style.justifyContent = "space-between";
+    header.innerHTML = '<div class="list-row__title">Custom buttons</div>';
+    var addBtn = document.createElement("button");
+    addBtn.className = "btn btn-primary btn-compact";
+    addBtn.textContent = "Add button";
+    addBtn.addEventListener("click", function () {
+      window.LayoutLibrary.addCustomNavButton();
+      renderCustomButtonsPanel();
+      renderNavManager();
+    });
+    header.appendChild(addBtn);
+    customNavPanelEl.appendChild(header);
+
+    if (!buttons.length) {
+      var empty = document.createElement("div");
+      empty.className = "helper-text";
+      empty.textContent = "No custom buttons configured.";
+      customNavPanelEl.appendChild(empty);
+      return;
+    }
+
+    buttons.forEach(function (btn) {
+      var row = document.createElement("div");
+      row.className = "list-row";
+
+      var main = document.createElement("div");
+      main.className = "list-row__main";
+      var labelField = document.createElement("input");
+      labelField.type = "text";
+      labelField.className = "text-input";
+      labelField.value = btn.label;
+      labelField.addEventListener("input", function () {
+        window.LayoutLibrary.updateCustomNavButton(btn.id, { label: labelField.value });
+        renderNavManager();
+      });
+      var urlField = document.createElement("input");
+      urlField.type = "text";
+      urlField.className = "text-input";
+      urlField.value = btn.url;
+      urlField.placeholder = "https://example.com";
+      urlField.addEventListener("input", function () {
+        window.LayoutLibrary.updateCustomNavButton(btn.id, { url: urlField.value });
+      });
+      main.appendChild(labelField);
+      main.appendChild(urlField);
+
+      var actions = document.createElement("div");
+      actions.className = "list-row__actions";
+      var toggle = document.createElement("input");
+      toggle.type = "checkbox";
+      toggle.checked = btn.enabled !== false;
+      toggle.addEventListener("change", function () {
+        window.LayoutLibrary.updateCustomNavButton(btn.id, { enabled: toggle.checked });
+        renderNavManager();
+      });
+      var remove = document.createElement("button");
+      remove.className = "btn btn-ghost btn-icon";
+      remove.textContent = "✕";
+      remove.setAttribute("aria-label", "Remove custom button");
+      remove.addEventListener("click", function () {
+        window.LayoutLibrary.removeCustomNavButton(btn.id);
+        renderCustomButtonsPanel();
+        renderNavManager();
+      });
+      actions.appendChild(toggle);
+      actions.appendChild(remove);
+
+      row.appendChild(main);
+      row.appendChild(actions);
+      customNavPanelEl.appendChild(row);
+    });
   }
 
   function initAdminConsole() {
@@ -566,7 +892,12 @@
     widgetLibrary = window.LayoutLibrary.getWidgetLibrary();
     roles = window.LayoutLibrary.getRoles();
     cacheElements();
+    renderPortalBasics();
+    renderBrandingForm();
+    renderAuthSettings();
     renderNavManager();
+    renderNavToggles();
+    renderCustomButtonsPanel();
     renderPageList();
     renderLayoutEditor();
     renderWidgetVisibilityControls();
@@ -591,7 +922,12 @@
   window.AdminConsole = {
     init: initAdminConsole,
     refreshForRole: function () {
+      renderPortalBasics();
+      renderBrandingForm();
+      renderAuthSettings();
       renderNavManager();
+      renderNavToggles();
+      renderCustomButtonsPanel();
       renderPageList();
       renderLayoutEditor();
       renderWidgetVisibilityControls();

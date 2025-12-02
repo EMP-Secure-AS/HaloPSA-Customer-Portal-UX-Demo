@@ -98,15 +98,22 @@
 
   function registerCoreWidgets() {
     coreRegistered = true;
-    registry["hero-search"] = function (container) {
+    registry["hero-search"] = function (container, options) {
+      var portalSettings = (options && options.portalSettings) || {};
+      var headline = portalSettings.welcomeHeadline || "How can we help you today?";
+      var message =
+        portalSettings.welcomeMessage ||
+        "Quickly raise issues, request services, and find answers in our knowledge base.";
+      var badge = portalSettings.bannerText || "Portal Demo";
+
       container.classList.add("hero", "stack");
       container.innerHTML =
         '<div class="inline">' +
-        '  <div class="badge">Portal Demo</div>' +
+        '  <div class="badge">' + badge + "</div>" +
         '  <span class="muted small-text">Widget-driven layout</span>' +
         "</div>" +
-        "<h1>How can we help you today?</h1>" +
-        "<p>Quickly raise issues, request services, and find answers in our knowledge base.</p>" +
+        "<h1>" + headline + "</h1>" +
+        "<p>" + message + "</p>" +
         '<div class="search-bar">' +
         '  <input type="search" placeholder="Search for help, articles, or services" aria-label="Search" />' +
         '  <button class="btn btn-primary">Search</button>' +
