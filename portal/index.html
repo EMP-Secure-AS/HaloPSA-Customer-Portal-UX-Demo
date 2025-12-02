@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <title>Halo Portal UX Demo – Customer Portal</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="../assets/css/base.css" />
+</head>
+<body>
+  <header class="app-header">
+    <div class="app-header__brand">
+      <span class="brand-mark">G</span>
+      <span class="brand-name">Generic IT Support</span>
+    </div>
+    <nav class="app-header__nav">
+      <a href="./index.html" class="nav-link nav-link--active">Home</a>
+      <a href="#" class="nav-link">My Tickets</a>
+      <a href="#" class="nav-link">Knowledge Base</a>
+      <a href="#" class="nav-link">Dashboards</a>
+    </nav>
+    <div class="app-header__actions">
+      <button id="theme-toggle" class="btn btn-ghost">Toggle theme</button>
+      <div class="avatar-pill">
+        <span class="avatar-pill__initials">JD</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="app-main">
+    <h1>Customer Portal – UX Demo</h1>
+    <p>
+      This is a placeholder for the customer portal homepage.
+      Codex will gradually turn this into a fully widget‑based layout.
+    </p>
+  </main>
+
+  <script src="../assets/js/app.js"></script>
+  <script>
+    if (window.initPortal) {
+      window.initPortal();
+    }
+  </script>
+</body>
+</html>

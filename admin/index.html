@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <title>Halo Portal UX Demo – Admin Console</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="../assets/css/base.css" />
+</head>
+<body class="admin-layout">
+  <aside class="admin-sidebar">
+    <div class="admin-sidebar__brand">
+      <span class="brand-mark">G</span>
+      <span class="brand-name">Portal Admin</span>
+    </div>
+    <nav class="admin-sidebar__nav">
+      <button class="admin-nav-item admin-nav-item--active" data-section="general">General</button>
+      <button class="admin-nav-item" data-section="branding">Branding & Themes</button>
+      <button class="admin-nav-item" data-section="navigation">Navigation</button>
+      <button class="admin-nav-item" data-section="pages">Pages</button>
+      <button class="admin-nav-item" data-section="widgets">Widgets</button>
+      <button class="admin-nav-item" data-section="roles">Roles</button>
+      <button class="admin-nav-item" data-section="devtools">Developer Tools</button>
+    </nav>
+  </aside>
+
+  <div class="admin-main">
+    <header class="admin-main__header">
+      <h1>Self Service Portal – Admin Console (UX Demo)</h1>
+      <div class="admin-main__actions">
+        <button id="admin-theme-toggle" class="btn btn-ghost">Toggle theme</button>
+      </div>
+    </header>
+
+    <section id="admin-section-general" class="admin-section admin-section--active">
+      <h2>General Settings</h2>
+      <p>
+        This section will eventually allow configuration of basic portal settings
+        such as title, URL, welcome message and login requirements.
+      </p>
+    </section>
+
+    <section id="admin-section-branding" class="admin-section">
+      <h2>Branding & Themes</h2>
+      <p>
+        This section will host the theme editor (colors, logos, light/dark mode).
+      </p>
+    </section>
+
+    <section id="admin-section-navigation" class="admin-section">
+      <h2>Navigation Manager</h2>
+      <p>
+        This section will manage which pages appear in the portal navigation,
+        their order and role‑based visibility.
+      </p>
+    </section>
+
+    <section id="admin-section-pages" class="admin-section">
+      <h2>Pages & Layouts</h2>
+      <p>
+        This section will contain the page builder UI, where admins can assemble
+        pages from widgets.
+      </p>
+    </section>
+
+    <section id="admin-section-widgets" class="admin-section">
+      <h2>Widget Library</h2>
+      <p>
+        This section will list core and custom widgets and their configuration.
+      </p>
+    </section>
+
+    <section id="admin-section-roles" class="admin-section">
+      <h2>Roles & Visibility</h2>
+      <p>
+        This section will control which pages and widgets are visible for
+        which roles (end user, manager, local IT, etc.).
+      </p>
+    </section>
+
+    <section id="admin-section-devtools" class="admin-section">
+      <h2>Developer Tools</h2>
+      <p>
+        This section will describe and eventually configure custom CSS/JS,
+        integrations and widget SDK options.
+      </p>
+    </section>
+  </div>
+
+  <script src="../assets/js/app.js"></script>
+  <script>
+    if (window.initAdmin) {
+      window.initAdmin();
+    }
+  </script>
+</body>
+</html>
