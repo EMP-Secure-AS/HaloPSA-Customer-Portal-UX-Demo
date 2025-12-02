@@ -1,15 +1,39 @@
 // Core app wiring for portal + admin pages
 (function () {
-  function applyStoredTheme() {
+  var THEME_KEY = "portal-theme";
+
+  function updateToggleLabels(theme) {
+    var buttons = document.querySelectorAll('[data-role="theme-toggle"]');
+    buttons.forEach(function (btn) {
+      var wantsDark = theme === "light";
+      btn.textContent = wantsDark ? "Dark mode" : "Light mode";
+      btn.setAttribute("aria-pressed", wantsDark ? "false" : "true");
+      btn.setAttribute("aria-label", wantsDark ? "Switch to dark mode" : "Switch to light mode");
+    });
+  }
+
+  function setTheme(theme, opts) {
     var root = document.documentElement;
+    root.setAttribute("data-theme", theme);
+    if (!opts || !opts.skipSave) {
+      try {
+        window.localStorage.setItem(THEME_KEY, theme);
+      } catch (e) {
+        // ignore write errors
+      }
+    }
+    updateToggleLabels(theme);
+  }
+
+  function applyStoredTheme() {
     var stored = null;
     try {
-      stored = window.localStorage && window.localStorage.getItem("portal-theme");
+      stored = window.localStorage && window.localStorage.getItem(THEME_KEY);
     } catch (e) {
       stored = null;
     }
     var theme = stored || "light";
-    root.setAttribute("data-theme", theme);
+    setTheme(theme, { skipSave: true });
     return theme;
   }
 
@@ -17,17 +41,13 @@
     var root = document.documentElement;
     var current = root.getAttribute("data-theme") || "light";
     var next = current === "light" ? "dark" : "light";
-    root.setAttribute("data-theme", next);
-    try {
-      window.localStorage.setItem("portal-theme", next);
-    } catch (e) {
-      // ignore write errors
-    }
+    setTheme(next);
   }
 
   function wireThemeButton(id) {
     var btn = document.getElementById(id);
     if (!btn) return;
+    btn.setAttribute("data-role", "theme-toggle");
     btn.addEventListener("click", toggleTheme);
   }
 
