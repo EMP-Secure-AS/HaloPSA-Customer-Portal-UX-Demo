@@ -3,6 +3,7 @@
   var THEME_KEY = "portal-theme";
   var ROLE_KEY = "portal-role";
   var currentRole = null;
+  var currentPageId = "home";
 
   function updateToggleLabels(theme) {
     var buttons = document.querySelectorAll('[data-role="theme-toggle"]');
@@ -57,6 +58,37 @@
     return [];
   }
 
+  function getPagesForRole(role) {
+    if (window.LayoutLibrary && window.LayoutLibrary.getPagesForRole) {
+      return window.LayoutLibrary.getPagesForRole(role);
+    }
+    return [];
+  }
+
+  function getDefaultPageForRole(role) {
+    var pages = getPagesForRole(role);
+    var navItems = window.LayoutLibrary && window.LayoutLibrary.getNavItemsForRole
+      ? window.LayoutLibrary.getNavItemsForRole(role)
+      : [];
+
+    var navPreferred = navItems
+      .map(function (item) { return item.pageId; })
+      .find(function (pageId) {
+        return pages.some(function (p) { return p.id === pageId; });
+      });
+
+    if (navPreferred) return navPreferred;
+    return pages[0] ? pages[0].id : "home";
+  }
+
+  function ensurePageAvailable(pageId, role) {
+    var pages = getPagesForRole(role);
+    if (!pages.length) return null;
+    var target = pages.find(function (p) { return p.id === pageId; });
+    if (target) return target.id;
+    return getDefaultPageForRole(role);
+  }
+
   function updateRolePickers(role) {
     var pickers = document.querySelectorAll('[data-role="role-picker"]');
     pickers.forEach(function (picker) {
@@ -86,6 +118,7 @@
     currentRole = role;
     persistRole(role);
     updateRolePickers(role);
+    currentPageId = ensurePageAvailable(currentPageId, role) || currentPageId;
     renderPortal(role);
     if (window.AdminConsole && window.AdminConsole.refreshForRole) {
       window.AdminConsole.refreshForRole(role);
@@ -208,8 +241,14 @@
     items.forEach(function (item, index) {
       var link = document.createElement("a");
       link.href = item.route;
-      link.className = "nav-link" + (index === 0 ? " nav-link--active" : "");
+      var isActive = item.pageId ? item.pageId === currentPageId : index === 0;
+      link.className = "nav-link" + (isActive ? " nav-link--active" : "");
+      link.dataset.pageId = item.pageId || "";
       link.textContent = item.label;
+      link.addEventListener("click", function (event) {
+        event.preventDefault();
+        setActivePage(item.pageId || currentPageId);
+      });
       nav.appendChild(link);
     });
   }
@@ -229,13 +268,50 @@
     return wrapper;
   }
 
-  function renderPortalLayout(role) {
+  function renderPortalLayout(pageId, role) {
     var content = document.getElementById("portal-content");
     if (!content || !window.LayoutLibrary || !window.WidgetSystem) return;
 
+    var pageMeta = window.LayoutLibrary.getPageById
+      ? window.LayoutLibrary.getPageById(pageId)
+      : null;
+
     var renderWidgets = function () {
-      var layout = window.LayoutLibrary.getLayoutForRole("home", role);
+      var layout = window.LayoutLibrary.getLayoutForRole(pageId, role);
       content.innerHTML = "";
+
+      var header = document.createElement("section");
+      header.className = "page-header";
+      var title = document.createElement("div");
+      title.className = "page-header__title stack";
+      var h1 = document.createElement("h1");
+      h1.textContent = (layout && layout.title) || (pageMeta && pageMeta.name) || "Portal";
+      h1.style.margin = "0";
+      var desc = document.createElement("p");
+      desc.className = "muted";
+      desc.style.margin = "0";
+      desc.textContent = (layout && layout.description) || (pageMeta && pageMeta.route) || "";
+      title.appendChild(h1);
+      if (desc.textContent) {
+        title.appendChild(desc);
+      }
+      header.appendChild(title);
+
+      var pills = document.createElement("div");
+      pills.className = "inline";
+      pills.style.flexWrap = "wrap";
+      pills.style.gap = "0.5rem";
+      var routePill = document.createElement("span");
+      routePill.className = "pill";
+      routePill.textContent = (pageMeta && pageMeta.route) || "Custom route";
+      pills.appendChild(routePill);
+      var rolePill = document.createElement("span");
+      rolePill.className = "pill pill--ghost";
+      rolePill.textContent = "Role: " + role.replace("_", " ");
+      pills.appendChild(rolePill);
+      header.appendChild(pills);
+
+      content.appendChild(header);
 
       layout.rows.forEach(function (row) {
         var section = document.createElement("section");
@@ -257,7 +333,9 @@
               role: role,
               variant: widget.variant,
               ticketView: window.LayoutLibrary.getTicketViewForRole(role),
-              config: window.LayoutLibrary.getWidgetConfig(widget.id)
+              config: window.LayoutLibrary.getWidgetConfig(widget.id),
+              navigate: setActivePage,
+              pageId: pageId
             };
             window.WidgetSystem.renderWidget(widget.id, widgetContainer, options);
           });
@@ -287,16 +365,43 @@
 
   function renderPortal(role) {
     renderNav(role);
-    renderPortalLayout(role);
+    renderPortalLayout(currentPageId, role);
+  }
+
+  function syncPageFromHash(role) {
+    var hash = window.location.hash || "";
+    if (hash.indexOf("#") === 0) hash = hash.slice(1);
+    if (!hash) return false;
+    setActivePage(hash, { skipHash: true, role: role });
+    return true;
+  }
+
+  function setActivePage(pageId, options) {
+    var roles = getAvailableRoles();
+    var fallbackRole = roles.length ? roles[0].id : "end_user";
+    var role = (options && options.role) || currentRole || fallbackRole;
+    var validPage = ensurePageAvailable(pageId, role);
+    if (!validPage) return;
+    currentPageId = validPage;
+    if (!options || !options.skipHash) {
+      window.location.hash = "#" + validPage;
+    }
+    renderPortal(role);
   }
 
   function initPortal() {
     applyStoredTheme();
     wireThemeButton("theme-toggle");
-    applyStoredRole();
+    var startingRole = applyStoredRole();
     wireRolePicker("role-select");
     wirePortalNavToggle();
-    renderPortal(currentRole);
+    var hashHandled = syncPageFromHash(startingRole);
+    if (!hashHandled) {
+      setActivePage(getDefaultPageForRole(startingRole), { skipHash: true, role: startingRole });
+    }
+    window.addEventListener("hashchange", function () {
+      syncPageFromHash(currentRole);
+    });
   }
 
   function initAdmin() {

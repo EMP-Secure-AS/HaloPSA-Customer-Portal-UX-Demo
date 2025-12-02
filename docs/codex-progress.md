@@ -143,3 +143,40 @@ Notes:
 - Introduced card hover elevation, widget fade-in animation, and a brief theme transition to smooth toggle feedback.
 - Captured fresh portal and admin screenshots in `docs/screenshots/` for documentation.
 - Expanded README with run instructions plus summaries of the widget system, role-aware behaviour, admin console features, and theming.
+
+---
+
+## Phase 8 – Portal Page Coverage & Navigation
+
+- [x] 8.1 Routes/views added for home, My Tickets, ticket details, report issue, send request, knowledge base, dashboards, and legacy/feedback
+- [x] 8.2 Navigation model maps routes to pages with role-aware visibility
+- [x] 8.3 Page layouts reuse the shared model and render per-role widgets
+- [x] 8.4 Mock data used for tickets, KB, catalog, dashboards, and feedback
+- [x] 8.5 Docs/progress updated
+
+Notes:
+
+- Portal now supports hash-based navigation across all core customer pages; nav links and quick actions call into the shared layout model and respect role filtering. Pages render dedicated widgets (ticket drilldown, issue form, service catalog, KB categories/articles, dashboards, legacy feedback) with mock data.
+- Page headers surface route context and active role; My Tickets gains filter chips while dashboards provide interactive range toggles. Mock submissions route users back to My Tickets/requests without backend calls.
+
+## Phase 9 – Halo Settings Mapping & Config UI
+
+- [ ] 9.1 Halo Self Service Portal settings reviewed and enumerated
+- [ ] 9.2 `docs/halo-settings-map.md` created with categories, mapping, and coverage labels
+- [ ] 9.3 Admin console extended with fields/toggles for Halo settings
+- [ ] 9.4 Demo-influencing settings wired (title, welcome, colors, nav visibility, behaviour flags)
+- [ ] 9.5 Docs/progress updated with coverage notes
+
+Notes:
+
+- Settings mapping document has been drafted ahead of implementation; admin UI wiring and interactive settings will be tackled in Phase 9.
+
+## Phase 10 – Advanced Page/Block Editor
+
+- [ ] 10.1 Row add/remove with selectable column layouts
+- [ ] 10.2 Row/widget reordering
+- [ ] 10.3 Widget property panel for configuration
+- [ ] 10.4 Layout changes persist to shared model
+- [ ] 10.5 Optional localStorage persistence for layouts
+- [ ] 10.6 Enhanced editor affordances and placeholders
+- [ ] 10.7 Docs/progress updated for Phase 10 tasks

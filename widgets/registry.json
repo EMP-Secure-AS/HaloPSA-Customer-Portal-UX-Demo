@@ -3,6 +3,13 @@
     { "id": "hero-search", "name": "Hero Search", "description": "Search-focused hero with quick prompts." },
     { "id": "quick-actions", "name": "Quick Actions", "description": "Entry points for common service actions." },
     { "id": "recent-tickets", "name": "Recent Tickets", "description": "List of the latest support requests." },
+    { "id": "ticket-details", "name": "Ticket Details", "description": "Mock ticket drilldown view." },
+    { "id": "issue-form", "name": "Report Issue", "description": "Guided incident submission form." },
+    { "id": "service-catalog", "name": "Service Catalog", "description": "Browse and request services." },
+    { "id": "kb-categories", "name": "Knowledge Categories", "description": "Browse KB categories." },
+    { "id": "kb-article", "name": "Knowledge Article", "description": "Read the selected knowledge article." },
+    { "id": "insights-dashboard", "name": "Insights Dashboard", "description": "Interactive dashboard mock." },
+    { "id": "legacy-feedback", "name": "Legacy & Feedback", "description": "Closed ticket review and feedback." },
     { "id": "news", "name": "News", "description": "Company or IT news feed." },
     { "id": "service-status", "name": "Service Status", "description": "Current health of key services." },
     { "id": "top-articles", "name": "Top Articles", "description": "Frequently used knowledge base content." }
