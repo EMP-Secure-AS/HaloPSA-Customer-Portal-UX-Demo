@@ -16,14 +16,15 @@ Use simple markdown checklists and timestamps where helpful.
 
 ## Phase 0 – Housekeeping & Codebase Review
 
-- [ ] 0.1 Initial review completed
-- [ ] 0.2 Folder structure verified
-- [ ] 0.3 Missing pieces identified and noted
-- [ ] 0.4 Portal and admin placeholders render correctly
+- [x] 0.1 Initial review completed
+- [x] 0.2 Folder structure verified
+- [x] 0.3 Missing pieces identified and noted
+- [x] 0.4 Portal and admin placeholders render correctly
 
 Notes:
 
-- _No work has been logged yet._
+- Reviewed core docs and confirmed expected structure (`portal/`, `admin/`, `assets/`, `widgets/`, `docs/`).
+- Portal and admin placeholders already include basic layout, shared styles, and theme toggle wiring; no broken elements found during review.
 
 ---
 
