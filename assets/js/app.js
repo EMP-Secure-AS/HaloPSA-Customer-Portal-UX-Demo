@@ -71,10 +71,26 @@
     });
   }
 
+  function hydratePortalWidgets() {
+    if (!window.WidgetSystem) return;
+
+    window.WidgetSystem.registerCoreWidgets();
+
+    var renderSlots = function () {
+      var containers = document.querySelectorAll("[data-widget-id]");
+      containers.forEach(function (slot) {
+        var widgetId = slot.getAttribute("data-widget-id");
+        window.WidgetSystem.renderWidget(widgetId, slot);
+      });
+    };
+
+    window.WidgetSystem.loadWidgetRegistry().then(renderSlots).catch(renderSlots);
+  }
+
   function initPortal() {
     applyStoredTheme();
     wireThemeButton("theme-toggle");
-    // Phase 1 keeps logic light; later phases will hydrate widgets/layouts here.
+    hydratePortalWidgets();
   }
 
   function initAdmin() {
